@@ -18,7 +18,7 @@ async function demarrer(code) {
         if (A.moi.role !== 'atc') { location.href = 'suivi.html'; return; }
         $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
         $('#qui').textContent = '· ' + A.moi.nom;
-        $('#bonjour').textContent = `Bonjour ${A.moi.nom} 👋`;
+        $('#bonjour').textContent = `Bonjour ${A.moi.prenom || A.moi.nom} 👋`;
         compteARebours($('#cd'));
         await charger();
     } catch (e) {
@@ -56,10 +56,35 @@ const FILTRES = [
 
 function rendre() { rendreKpis(); rendreFiltres(); rendreListe(); rendreArgs(); }
 
+// Objectif annuel : CA actuel, objectif, reste à faire, et ce que l'opération y apporte
+function rendreObjectif(caOpe) {
+    const el = $('#objectif'), ca = +A.moi.ca_actuel, obj = +A.moi.objectif;
+    if (!A.moi.objectif || !obj) { el.classList.add('hidden'); return; }
+    el.classList.remove('hidden');
+    const reste = obj - ca, apres = reste - caOpe, max = Math.max(obj, ca + caOpe);
+    const w = v => Math.max(0, v / max * 100).toFixed(2) + '%';
+    const p3 = REFS.find(r => r.id === 'p3-ent-vigie');
+    let msg;
+    if (reste <= 0) msg = `Objectif déjà dépassé de <b>${euro(-reste, 0)}</b> 🎉 Chaque commande de l’opération est du bonus${caOpe ? ` : déjà <b>+${euro(caOpe, 0)}</b>` : ''}.`;
+    else if (apres <= 0) msg = `Avec l’opération, ton objectif est <b>atteint</b> 🎉 (+${euro(-apres, 0)}).`;
+    else if (caOpe) msg = `L’opération couvre déjà <b>${Math.round(caOpe / reste * 100)} %</b> de ton reste à faire. Encore <b>${euro(apres, 0)}</b>, soit l’équivalent de ${Math.ceil(apres / p3.promo)} Présence 3.`;
+    else msg = `L’opération est l’occasion de le réduire : <b>${euro(reste, 0)}</b>, c’est l’équivalent de ${Math.ceil(reste / p3.promo)} Présence 3 au prix opé.`;
+    el.innerHTML = `<div>
+        <div class="l">Mon objectif annuel</div>
+        <div class="big num">${reste > 0 ? `${euro(Math.max(0, apres), 0)}` : 'Atteint ✓'}</div>
+        <div class="sub">${reste > 0 ? 'reste à faire' + (caOpe ? ' après tes commandes de l’opé' : '') : `dépassé de ${euro(-reste, 0)}`} · CA actuel <b class="num">${euro(ca, 0)}</b> · objectif <b class="num">${euro(obj, 0)}</b></div>
+    </div><div>
+        <div class="track"><span class="a" style="width:${w(ca)}"></span><span class="o" style="width:${w(caOpe)}"></span></div>
+        <div class="leg"><span><i style="background:rgba(255,255,255,.55)"></i>CA actuel ${Math.round(ca / obj * 100)} %</span><span><i style="background:var(--accent)"></i>Opération +${euro(caOpe, 0)}</span><span>Objectif ${euro(obj, 0)}</span></div>
+        <div class="msg">${msg}</div>
+    </div>`;
+}
+
 function rendreKpis() {
     const n = A.iap.length, c = k => A.iap.filter(i => i.suivi?.[k]).length;
     const ca = A.iap.reduce((t, i) => t + (+i.suivi?.montant || 0), 0);
     const pct = (v) => n ? Math.round(v / n * 100) : 0;
+    rendreObjectif(ca);
     $('#sous').textContent = `${n} IAP dans ton portefeuille · ${OPE.finTexte}`;
     $('#kpis').innerHTML = [
         ['Appelés', c('appel'), `sur ${n} IAP`, pct(c('appel'))],

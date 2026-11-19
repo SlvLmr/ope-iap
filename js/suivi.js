@@ -52,14 +52,19 @@ function stats(list) {
     const unites = list.reduce((t, i) => t + Object.values(i.suivi?.quantites || {}).reduce((a, b) => a + b, 0), 0);
     return { n: list.length, appel: c('appel'), mail: c('mail'), presentation: c('presentation'), commande: c('commande'), ca, unites };
 }
+const reste = a => a.objectif == null ? null : +a.objectif - (+a.ca_actuel || 0);
 function rendreBoard() {
     const iap = S.data.iap, t = stats(iap);
+    const avecObj = S.data.atc.filter(a => reste(a) > 0);
+    const resteTotal = avecObj.reduce((s, a) => s + reste(a), 0);
+    const resteApres = avecObj.reduce((s, a) => s + Math.max(0, reste(a) - stats(iap.filter(i => i.atc === a.nom)).ca), 0);
     $('#kpis').innerHTML = [
         ['CA opération', euro(t.ca, 0), 'HT, prix promo'],
         ['Commandes', t.commande, `${pct(t.commande, t.appel)} % des IAP appelés`],
         ['Serrures vendues', t.unites, t.commande ? `${(t.unites / t.commande).toFixed(1).replace('.', ',')} par commande` : '—'],
         ['Panier moyen', t.commande ? euro(t.ca / t.commande, 0) : '—', 'HT par commande'],
         ['IAP appelés', `${t.appel} / ${t.n}`, `${pct(t.appel, t.n)} % du réseau`, pct(t.appel, t.n)],
+        ...(resteTotal > 0 ? [['Reste à faire ATC', euro(resteApres, 0), `objectifs annuels · l’opé en couvre ${pct(resteTotal - resteApres, resteTotal)} %`, pct(resteTotal - resteApres, resteTotal)]] : []),
     ].map(([l, v, s, p]) => `<div class="card kpi"><div class="l">${l}</div><div class="v num">${v}</div><div class="s">${s}</div>${p == null ? '' : `<div class="bar"><i style="width:${p}%"></i></div>`}</div>`).join('');
 
     $('#funnel').innerHTML = [['IAP', t.n], ...ETAPES.map(e => [e.nom, t[e.k]])].map(([l, v]) =>
@@ -71,11 +76,17 @@ function rendreBoard() {
         `<tr><td><b>Total</b></td><td class="r num"><b>${t.unites}</b></td><td class="r num"><b>${euro(t.ca, 0)}</b></td></tr></tbody>`;
 
     const atcs = S.data.atc.map(a => ({ ...a, ...stats(iap.filter(i => i.atc === a.nom)) })).sort((a, b) => b.ca - a.ca || b.commande - a.commande || b.appel / (b.n || 1) - a.appel / (a.n || 1));
-    $('#atcs').innerHTML = `<thead><tr><th></th><th>ATC</th><th class="r">IAP</th><th>Appelés</th><th class="r">Mails</th><th class="r">Présent.</th><th class="r">Cdes</th><th class="r">CA HT</th><th>Dernière connexion</th></tr></thead><tbody>` +
-        atcs.map((a, k) => `<tr class="click" data-atc="${esc(a.nom)}"><td><span class="rk ${k < 3 && a.ca > 0 ? 'g' : ''}">${k + 1}</span></td><td><b>${esc(a.nom)}</b></td><td class="r num">${a.n}</td>
+    $('#atcs').innerHTML = `<thead><tr><th></th><th>ATC</th><th class="r">IAP</th><th>Appelés</th><th class="r">Mails</th><th class="r">Présent.</th><th class="r">Cdes</th><th class="r">CA opé HT</th>
+        <th class="r">CA actuel</th><th class="r">Objectif</th><th class="r">Reste à faire</th><th>Atteinte (avec opé)</th><th>Connexion</th></tr></thead><tbody>` +
+        atcs.map((a, k) => {
+            const r = reste(a), apres = r == null ? null : r - a.ca, att = a.objectif ? Math.round(((+a.ca_actuel || 0) + a.ca) / a.objectif * 100) : null;
+            return `<tr class="click" data-atc="${esc(a.nom)}"><td><span class="rk ${k < 3 && a.ca > 0 ? 'g' : ''}">${k + 1}</span></td><td><b>${esc(a.nom)}</b>${a.prenom ? `<div class="muted" style="font-size:12px">${esc(a.prenom)}</div>` : ''}</td><td class="r num">${a.n}</td>
         <td><div class="mini"><div class="t"><i style="width:${pct(a.appel, a.n)}%"></i></div><span>${pct(a.appel, a.n)} %</span></div></td>
         <td class="r num">${a.mail}</td><td class="r num">${a.presentation}</td><td class="r num"><b>${a.commande}</b></td><td class="r num"><b>${euro(a.ca, 0)}</b></td>
-        <td class="muted" style="font-size:12px">${a.derniere_connexion ? heure(a.derniere_connexion) : '<span class="chip warn">jamais</span>'}</td></tr>`).join('') + '</tbody>';
+        <td class="r num">${a.ca_actuel == null ? '—' : euro(a.ca_actuel, 0)}</td><td class="r num">${a.objectif == null ? '—' : euro(a.objectif, 0)}</td>
+        <td class="r num">${apres == null ? '—' : apres <= 0 ? `<span class="neg">atteint (+${euro(-apres, 0)})</span>` : `<b>${euro(apres, 0)}</b>`}</td>
+        <td>${att == null ? '<span class="muted">—</span>' : `<div class="mini"><div class="t"><i style="width:${Math.min(100, att)}%"></i></div><span>${att} %</span></div>`}</td>
+        <td class="muted" style="font-size:12px">${a.derniere_connexion ? heure(a.derniere_connexion) : '<span class="chip warn">jamais</span>'}</td></tr>`; }).join('') + '</tbody>';
     document.querySelectorAll('#atcs tr[data-atc]').forEach(tr => tr.onclick = () => { S.fAtc = tr.dataset.atc; $('#fAtc').value = S.fAtc; rendreDetail(); vue('detail'); });
 
     $('#journal').innerHTML = S.data.journal.length ? S.data.journal.map(j => {
@@ -85,6 +96,7 @@ function rendreBoard() {
             const parts = Object.entries(d).map(([k, v]) => k === 'quantites' ? `commande ${euro(montantDe(v), 0)}` : NOM_ETAPE[k] ? `${NOM_ETAPE[k]} ${v ? '✓' : '✗'}` : k === 'commentaire' ? 'note' : k === 'rappel' ? 'rappel prévu' : k === 'date_contact' ? 'date de contact' : k);
             txt = `<b>${esc(j.par)}</b> · ${esc(j.raison || '')} : ${esc(parts.join(', '))}`;
         } else if (j.action === 'import') txt = `<b>${esc(j.par)}</b> a importé le listing (${j.detail?.lignes} IAP)`;
+        else if (j.action === 'objectif') txt = `<b>${esc(j.par)}</b> a mis à jour l’objectif de ${esc(j.detail?.nom || '')}`;
         else txt = `<b>${esc(j.par)}</b> · code ${esc(j.detail?.nom || '')} : ${esc(j.detail?.action || '')}`;
         return `<div><time>${heure(j.at)}</time><span>${txt}</span></div>`;
     }).join('') : '<div class="muted">Aucune activité pour le moment.</div>';
@@ -135,7 +147,26 @@ $('#xAll').onclick = () => exporter(filtrees().map(i => ({ ATC: i.atc, 'N° clie
 
 // ─── Codes (direction) ───
 const lienAtc = c => `${location.origin}${location.pathname.replace(/[^/]*$/, '')}atc.html#code=${c}`;
+function rendreObjectifs() {
+    const atcs = S.codes.filter(c => c.role === 'atc');
+    const n0 = v => v == null ? '' : Math.round(v);
+    $('#objectifs').innerHTML = `<thead><tr><th>ATC</th><th>Prénom</th><th class="r">CA actuel (€)</th><th class="r">Objectif (€)</th><th class="r">Reste à faire</th><th>Mis à jour</th></tr></thead><tbody>` +
+        atcs.map(c => { const r = c.objectif == null ? null : c.objectif - (c.ca_actuel || 0); return `<tr data-nom="${esc(c.nom)}"><td><b>${esc(c.nom)}</b></td>
+        <td><input class="p" data-f="prenom" value="${esc(c.prenom || '')}"></td>
+        <td class="r"><input data-f="ca" inputmode="decimal" value="${n0(c.ca_actuel)}"></td><td class="r"><input data-f="obj" inputmode="decimal" value="${n0(c.objectif)}"></td>
+        <td class="r num">${r == null ? '—' : r <= 0 ? `<span class="neg">dépassé de ${euro(-r, 0)}</span>` : `<b>${euro(r, 0)}</b>`}</td>
+        <td class="muted" style="font-size:12px">${c.ca_maj ? heure(c.ca_maj) : '—'}</td></tr>`; }).join('') + '</tbody>';
+}
+$('#objectifs').addEventListener('change', async e => {
+    const tr = e.target.closest('tr[data-nom]'); if (!tr) return;
+    const v = f => tr.querySelector(`[data-f="${f}"]`).value.trim();
+    const num = x => { const n = parseFloat(x.replace(/\s/g, '').replace(',', '.')); return isNaN(n) ? null : n; };
+    try { S.codes = await API.objectifMaj(tr.dataset.nom, v('prenom'), num(v('ca')), num(v('obj'))); rendreObjectifs(); toast('Objectif enregistré'); charger(true); }
+    catch (err) { toast(err.message, true); }
+});
+
 function rendreCodes() {
+    rendreObjectifs();
     const ROLE = { atc: 'ATC', adv: 'ADV', direction: 'Direction' };
     $('#codes').innerHTML = `<thead><tr><th>Nom</th><th>Rôle</th><th>Code</th><th>Dernière connexion</th><th></th></tr></thead><tbody>` +
         S.codes.map(c => `<tr style="${c.actif ? '' : 'opacity:.5'}"><td><b>${esc(c.nom)}</b></td><td>${ROLE[c.role]}</td><td><span class="code">${esc(c.code)}</span></td>

@@ -17,6 +17,10 @@ create table public.boost_acces (
   email text,
   actif boolean not null default true,
   derniere_connexion timestamptz,
+  prenom text,
+  ca_actuel numeric,                     -- CA de l'année à date (saisi par la direction)
+  objectif numeric,                      -- objectif annuel ; reste à faire = objectif - ca_actuel
+  ca_maj timestamptz,
   created_at timestamptz not null default now()
 );
 create unique index boost_acces_atc_unique on public.boost_acces (nom) where role = 'atc';
@@ -102,7 +106,7 @@ declare a public.boost_acces;
 begin
   a := public.boost_qui(p_code);
   update public.boost_acces set derniere_connexion = now() where code = a.code;
-  return jsonb_build_object('nom', a.nom, 'role', a.role);
+  return jsonb_build_object('nom', a.nom, 'role', a.role, 'prenom', a.prenom, 'ca_actuel', a.ca_actuel, 'objectif', a.objectif, 'ca_maj', a.ca_maj);
 end $$;
 
 -- Ligne IAP + suivi, au format JSON
@@ -176,7 +180,8 @@ begin
   if a.role = 'atc' then raise exception 'Accès réservé au suivi.'; end if;
   return jsonb_build_object(
     'iap', coalesce((select jsonb_agg(public.boost_ligne(i) order by i.atc, i.raison) from public.boost_iap i), '[]'::jsonb),
-    'atc', coalesce((select jsonb_agg(jsonb_build_object('nom', x.nom, 'derniere_connexion', x.derniere_connexion, 'actif', x.actif) order by x.nom)
+    'atc', coalesce((select jsonb_agg(jsonb_build_object('nom', x.nom, 'prenom', x.prenom, 'derniere_connexion', x.derniere_connexion, 'actif', x.actif,
+                       'ca_actuel', x.ca_actuel, 'objectif', x.objectif, 'ca_maj', x.ca_maj) order by x.nom)
                      from public.boost_acces x where x.role = 'atc'), '[]'::jsonb),
     'journal', coalesce((select jsonb_agg(j order by j.at desc) from (select jj.at, jj.par, jj.action, jj.detail, ii.raison
                      from public.boost_journal jj left join public.boost_iap ii on ii.id = jj.iap_id order by jj.at desc limit 60) j), '[]'::jsonb)
@@ -221,6 +226,20 @@ begin
   return public.boost_codes(p_code);
 end $$;
 
+-- ─── Direction : CA actuel et objectif annuel d'un ATC ───
+create or replace function public.boost_objectif_maj(p_code text, p_nom text, p_prenom text, p_ca numeric, p_objectif numeric)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare a public.boost_acces;
+begin
+  a := public.boost_qui(p_code);
+  if a.role <> 'direction' then raise exception 'Accès réservé à la direction.'; end if;
+  update public.boost_acces set prenom = nullif(trim(p_prenom), ''), ca_actuel = p_ca, objectif = p_objectif, ca_maj = now()
+   where role = 'atc' and nom = p_nom;
+  if not found then raise exception 'ATC introuvable : %', p_nom; end if;
+  insert into public.boost_journal (par, action, detail) values (a.nom, 'objectif', jsonb_build_object('nom', p_nom));
+  return public.boost_codes(p_code);
+end $$;
+
 -- ─── Direction : import du listing IAP (remplace la liste, conserve le suivi des IAP connus : clé N° + nom) ───
 -- p_rows : [{ atc, numero, raison, statut, contact_nom, contact_prenom, mail, portable, adresse, cp, ville }]
 create or replace function public.boost_import(p_code text, p_rows jsonb)
@@ -250,7 +269,8 @@ begin
 end $$;
 
 grant execute on function public.boost_connexion(text), public.boost_mes_iap(text), public.boost_maj(text, int, jsonb),
-  public.boost_tableau(text), public.boost_codes(text), public.boost_code_maj(text, text, text, text), public.boost_import(text, jsonb)
+  public.boost_tableau(text), public.boost_codes(text), public.boost_code_maj(text, text, text, text), public.boost_import(text, jsonb),
+  public.boost_objectif_maj(text, text, text, numeric, numeric)
   to anon, authenticated;
 
 -- Premiers codes : direction et ADV (les codes ATC sont créés à l'import du listing)

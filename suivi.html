@@ -39,7 +39,7 @@
     .mini { display: flex; align-items: center; gap: 8px; min-width: 110px; }
     .mini .t { flex: 1; height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
     .mini .t i { display: block; height: 100%; background: var(--grad); }
-    .mini span { font-size: 12px; color: var(--text-2); width: 34px; text-align: right; font-variant-numeric: tabular-nums; }
+    .mini span { font-size: 12px; color: var(--text-2); width: 42px; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
     .dots { display: flex; gap: 4px; }
     .dots i { width: 22px; height: 22px; border-radius: 7px; background: var(--surface-2); display: grid; place-items: center; font-size: 11px; font-style: normal; color: transparent; }
     .dots i.on { background: var(--accent-soft); color: var(--accent-ink); }
@@ -50,6 +50,9 @@
     .journal div { padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; display: flex; gap: 10px; }
     .journal time { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; width: 92px; flex: none; }
     .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; letter-spacing: .08em; background: var(--surface-2); padding: 3px 8px; border-radius: 8px; }
+    #objectifs input { height: 34px; border-radius: 10px; border: 1px solid var(--line-2); padding: 0 10px; width: 140px; text-align: right; font-variant-numeric: tabular-nums; }
+    #objectifs input.p { width: 120px; text-align: left; }
+    .neg { color: var(--ok-ink); font-weight: 700; }
     .drop { border: 2px dashed var(--line-2); border-radius: 16px; padding: 26px; text-align: center; color: var(--text-2); cursor: pointer; }
     .drop:hover { border-color: var(--accent); }
     @media (max-width: 900px) { .row2 { grid-template-columns: 1fr; } }
@@ -120,6 +123,8 @@
                 <div class="bd tbl"><table id="codes"></table>
                 <form id="addCode" class="filters" style="margin-top:14px"><input id="newNom" placeholder="Nom (ex. nouvel ATC)" required><select id="newRole"><option value="atc">ATC</option><option value="adv">ADV</option><option value="direction">Direction</option></select><button class="btn sm dark">Créer un code</button></form></div>
             </div>
+            <div class="card" style="margin-top:16px"><div class="hd"><h3>Objectifs annuels des ATC</h3><span class="muted" style="font-size:13px">CA actuel et objectif : chaque ATC voit les siens dans son espace</span></div>
+                <div class="bd tbl"><table id="objectifs"></table></div></div>
             <div class="card" style="margin-top:16px"><div class="hd"><h3>Mettre à jour le listing IAP</h3></div><div class="bd">
                 <p class="muted" style="margin:0 0 12px;font-size:13px">Fichier Excel au même format que « Listing IAP 2026 » (colonnes Commercial, N°, Nom, Statut 2026, Nom, Prénom, Mail, Portable, Adresse, CP, Ville). Le suivi déjà saisi est conservé pour les IAP existants. Un code est créé pour chaque nouvel ATC.</p>
                 <label class="drop" id="drop">Déposer le fichier ici ou cliquer pour le choisir<input type="file" id="file" accept=".xlsx,.xls" hidden></label>

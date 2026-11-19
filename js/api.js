@@ -26,6 +26,7 @@ const API = (() => {
         tableau: () => rpc('boost_tableau', { p_code: code }),
         codes: () => rpc('boost_codes', { p_code: code }),
         codeMaj: (nom, role, action) => rpc('boost_code_maj', { p_code: code, p_nom: nom, p_role: role, p_action: action }),
+        objectifMaj: (nom, prenom, ca, objectif) => rpc('boost_objectif_maj', { p_code: code, p_nom: nom, p_prenom: prenom, p_ca: ca, p_objectif: objectif }),
         importer: rows => rpc('boost_import', { p_code: code, p_rows: rows }),
     };
 })();

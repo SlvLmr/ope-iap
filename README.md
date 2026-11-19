@@ -15,6 +15,7 @@ Opération flash sur les serrures de sécurité, réservée au réseau des Insta
 Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glisser sur mobile. Les prix et remises sont calculés à partir de `js/offre.js`.
 
 ### Espace ATC
+- **Objectif annuel** : CA actuel, objectif, reste à faire, et ce que les commandes de l’opération y apportent.
 - Uniquement les IAP de l’ATC, triés Elite → Premium → Officiel, avec leurs coordonnées (téléphone cliquable).
 - To-do par IAP : **Date / Appel / Mail / Présentation / Commande**. Chaque étape cochée est datée automatiquement.
 - Filtres : à traiter, à rappeler, pas encore appelés, commandés.
@@ -23,9 +24,9 @@ Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glis
 - Lien direct : `atc.html#code=XXXX-XXXX` connecte l’ATC sans saisie.
 
 ### Suivi
-- Indicateurs (CA, commandes, serrures vendues, panier moyen, IAP appelés), entonnoir, ventes par référence, classement des ATC, activité récente. Actualisation chaque minute.
+- Indicateurs (CA, commandes, serrures vendues, panier moyen, IAP appelés, reste à faire des ATC), entonnoir, ventes par référence, classement des ATC avec CA actuel / objectif / reste à faire / atteinte, activité récente. Actualisation chaque minute.
 - Détail de tous les IAP, filtres, **exports Excel** (commandes pour l’ADV, suivi complet).
-- Direction uniquement : **codes d’accès** (copier les liens, régénérer, désactiver, créer) et **import du listing IAP** (même format que « Listing IAP 2026 »).
+- Direction uniquement : **objectifs annuels** (CA actuel et objectif par ATC, modifiables), **codes d’accès** (copier les liens, régénérer, désactiver, créer) et **import du listing IAP** (même format que « Listing IAP 2026 »).
 
 ## Données et sécurité
 
@@ -33,6 +34,7 @@ Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glis
 - **Aucune donnée IAP dans ce dépôt** : le listing est importé dans la base (le `.gitignore` bloque les fichiers Excel).
 - Les tables ne sont pas lisibles directement : tout passe par des fonctions qui vérifient le code. Un ATC ne voit et ne modifie que ses IAP ; l’ADV est en lecture seule ; la direction gère les codes et le listing.
 - Chaque modification est historisée (`boost_journal`).
+- Les chiffres (CA, objectifs) sont stockés dans la base, jamais dans ce dépôt.
 - Les codes ne sont pas écrits ici : ils se consultent dans `suivi.html`, onglet *Codes & listing*.
 
 ## Modifier l’offre
