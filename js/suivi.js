@@ -230,9 +230,13 @@ async function importer(f) {
 }
 
 // Aperçu des changements avant de remplacer le listing
-function apercu(nom, data, ignorees) {
+function apercu(nom, brut, ignorees) {
     const cle = r => r.numero + '|' + r.raison;
-    const actuels = new Map(S.data.iap.map(i => [cle(i), i])), fichier = new Set(data.map(cle));
+    const actuels = new Map(S.data.iap.map(i => [cle(i), i]));
+    // ATC retirés : un IAP déjà réattribué garde son ATC actuel, un IAP inconnu est ignoré
+    const atcRetires = new Set(S.data.atc_retires || []); let ignRetire = 0;
+    const data = brut.flatMap(r => { if (!atcRetires.has(r.atc)) return [r]; const a = actuels.get(cle(r)); if (a) return [{ ...r, atc: a.atc }]; ignRetire++; return []; });
+    const fichier = new Set(data.map(cle));
     const champs = ['atc', 'statut', 'contact_nom', 'contact_prenom', 'mail', 'portable', 'adresse', 'cp', 'ville'];
     const nouveaux = data.filter(r => !actuels.has(cle(r)));
     const modifies = data.filter(r => { const a = actuels.get(cle(r)); return a && champs.some(k => (a[k] || '') !== (r[k] || '')); });
@@ -247,6 +251,7 @@ function apercu(nom, data, ignorees) {
             <div><b>${data.length}</b>IAP dans le fichier</div><div><b>${nouveaux.length}</b>nouveaux</div><div><b>${modifies.length}</b>mis à jour</div><div><b>${retires.length}</b>retirés</div>
         </div>
         ${ignorees ? `<div class="warn">${ignorees} ligne(s) ignorée(s) : Commercial, N° ou Nom manquant.</div>` : ''}
+        ${ignRetire ? `<div class="warn">${ignRetire} IAP d’un ATC retiré (${[...atcRetires].map(esc).join(', ')}) ignoré(s) : attribuez-les à un ATC actif dans le fichier.</div>` : ''}
         ${retiresSuivis.length ? `<div class="warn">⚠️ ${retiresSuivis.length} IAP retiré(s) ont déjà un suivi (appel, mail, commande…) : il sera supprimé avec eux.</div>` : ''}
         ${atcNouveaux.length ? `<p><b>Nouveaux ATC</b> (un code d’accès sera créé) : ${atcNouveaux.map(esc).join(', ')}</p>` : ''}
         ${changeAtc.length ? `<p><b>${changeAtc.length} IAP changent d’ATC</b>${liste(changeAtc, r => `${esc(r.raison)} : ${esc(actuels.get(cle(r)).atc)} → ${esc(r.atc)}`)}</p>` : ''}

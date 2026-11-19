@@ -21,6 +21,7 @@ create table public.boost_acces (
   ca_actuel numeric,                     -- CA de l'année à date (saisi par la direction)
   objectif numeric,                      -- objectif annuel ; reste à faire = objectif - ca_actuel
   ca_maj timestamptz,
+  retire boolean not null default false,  -- ATC retiré : n'apparaît plus nulle part, et l'import ne le recrée pas
   created_at timestamptz not null default now()
 );
 create unique index boost_acces_atc_unique on public.boost_acces (nom) where role = 'atc';
@@ -275,3 +276,64 @@ grant execute on function public.boost_connexion(text), public.boost_mes_iap(tex
 
 -- Premiers codes : direction et ADV (les codes ATC sont créés à l'import du listing)
 insert into public.boost_acces (code, nom, role) values (public.boost_nouveau_code(), 'Direction', 'direction'), (public.boost_nouveau_code(), 'ADV', 'adv');
+
+-- ============================================================
+--  Évolution : ATC retirés (ex. Assier, IAP confiés à Videau)
+--  Un ATC retiré disparaît du suivi et des codes ; à l'import, ses lignes
+--  gardent l'ATC actuel de l'IAP s'il existe déjà, sinon elles sont ignorées.
+-- ============================================================
+create or replace function public.boost_tableau(p_code text)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare a public.boost_acces;
+begin
+  a := public.boost_qui(p_code);
+  if a.role = 'atc' then raise exception 'Accès réservé au suivi.'; end if;
+  return jsonb_build_object(
+    'iap', coalesce((select jsonb_agg(public.boost_ligne(i) order by i.atc, i.raison) from public.boost_iap i), '[]'::jsonb),
+    'atc', coalesce((select jsonb_agg(jsonb_build_object('nom', x.nom, 'prenom', x.prenom, 'derniere_connexion', x.derniere_connexion, 'actif', x.actif,
+                       'ca_actuel', x.ca_actuel, 'objectif', x.objectif, 'ca_maj', x.ca_maj) order by x.nom)
+                     from public.boost_acces x where x.role = 'atc' and not x.retire), '[]'::jsonb),
+    'atc_retires', coalesce((select jsonb_agg(x.nom order by x.nom) from public.boost_acces x where x.role = 'atc' and x.retire), '[]'::jsonb),
+    'journal', coalesce((select jsonb_agg(j order by j.at desc) from (select jj.at, jj.par, jj.action, jj.detail, ii.raison
+                     from public.boost_journal jj left join public.boost_iap ii on ii.id = jj.iap_id order by jj.at desc limit 60) j), '[]'::jsonb)
+  );
+end $$;
+
+create or replace function public.boost_codes(p_code text)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare a public.boost_acces;
+begin
+  a := public.boost_qui(p_code);
+  if a.role <> 'direction' then raise exception 'Accès réservé à la direction.'; end if;
+  return coalesce((select jsonb_agg(to_jsonb(x) order by x.role desc, x.nom) from public.boost_acces x where not x.retire), '[]'::jsonb);
+end $$;
+
+create or replace function public.boost_import(p_code text, p_rows jsonb)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare a public.boost_acces; r jsonb; nb int := 0; ign int := 0; vus text[] := '{}'; num text; rs text; retires text[]; atc_ligne text;
+begin
+  a := public.boost_qui(p_code);
+  if a.role <> 'direction' then raise exception 'Accès réservé à la direction.'; end if;
+  select coalesce(array_agg(nom), '{}') into retires from public.boost_acces where role = 'atc' and retire;
+  for r in select * from jsonb_array_elements(p_rows) loop
+    num := nullif(trim(r ->> 'numero'), ''); rs := nullif(trim(r ->> 'raison'), ''); atc_ligne := nullif(trim(r ->> 'atc'), '');
+    if num is null or rs is null or atc_ligne is null then continue; end if;
+    if atc_ligne = any (retires) then
+      select i.atc into atc_ligne from public.boost_iap i where i.numero = num and i.raison = rs;
+      if atc_ligne is null then ign := ign + 1; continue; end if;
+    end if;
+    insert into public.boost_iap (atc, numero, raison, statut, contact_nom, contact_prenom, mail, portable, adresse, cp, ville)
+    values (atc_ligne, num, rs, nullif(trim(r ->> 'statut'), ''), nullif(trim(r ->> 'contact_nom'), ''), nullif(trim(r ->> 'contact_prenom'), ''),
+            nullif(trim(r ->> 'mail'), ''), nullif(trim(r ->> 'portable'), ''), nullif(trim(r ->> 'adresse'), ''), nullif(trim(r ->> 'cp'), ''), nullif(trim(r ->> 'ville'), ''))
+    on conflict (numero, raison) do update set atc = excluded.atc, statut = excluded.statut,
+      contact_nom = excluded.contact_nom, contact_prenom = excluded.contact_prenom, mail = excluded.mail, portable = excluded.portable,
+      adresse = excluded.adresse, cp = excluded.cp, ville = excluded.ville;
+    vus := vus || (num || '|' || rs); nb := nb + 1;
+  end loop;
+  if nb > 0 then delete from public.boost_iap where numero is null or not ((numero || '|' || raison) = any (vus)); end if;
+  insert into public.boost_acces (code, nom, role)
+  select public.boost_nouveau_code(), x.atc, 'atc' from (select distinct atc from public.boost_iap) x
+  where not exists (select 1 from public.boost_acces y where y.role = 'atc' and y.nom = x.atc);
+  insert into public.boost_journal (par, action, detail) values (a.nom, 'import', jsonb_build_object('lignes', nb, 'ignorees_atc_retire', ign));
+  return jsonb_build_object('lignes', nb, 'ignorees', ign);
+end $$;
