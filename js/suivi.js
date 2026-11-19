@@ -15,6 +15,7 @@ async function demarrer(code) {
         $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
         $('#qui').textContent = '· ' + S.moi.nom;
         $('#tabCodes').classList.toggle('hidden', S.moi.role !== 'direction');
+        $('#btnImport').classList.toggle('hidden', S.moi.role !== 'direction');
         compteARebours($('#cd'));
         await charger();
         setInterval(() => { if (!document.hidden) charger(true); }, 60000);
@@ -196,11 +197,24 @@ const drop = $('#drop');
 drop.ondragover = e => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; };
 drop.ondragleave = () => drop.style.borderColor = '';
 drop.ondrop = e => { e.preventDefault(); drop.style.borderColor = ''; if (e.dataTransfer.files[0]) importer(e.dataTransfer.files[0]); };
-$('#file').onchange = e => e.target.files[0] && importer(e.target.files[0]);
+$('#file').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) importer(f); };
+$('#btnImport').onclick = () => $('#file').click();
+const COLONNES = ['Commercial', 'N°', 'Nom', 'Statut 2026', 'Nom', 'Prénom', 'Mail', 'Portable', 'Adresse', 'CP', 'Ville'];
+$('#modele').onclick = () => {
+    const ws = XLSX.utils.aoa_to_sheet([COLONNES, ['Dupont', 'CLT26/0001', 'SERRURERIE EXEMPLE', 'PREMIUM', 'MARTIN', 'Paul', 'contact@exemple.fr', '06 00 00 00 00', '1 rue de l’Exemple', '75001', 'PARIS']]);
+    ws['!cols'] = COLONNES.map(() => ({ wch: 18 })); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'IAP'); XLSX.writeFile(wb, 'Modele listing IAP.xlsx');
+};
+const fermerImp = () => $('#impModal').classList.add('hidden');
+$('#impModal').addEventListener('click', e => { if (e.target.id === 'impModal' || e.target.closest('[data-close]')) fermerImp(); });
+
 async function importer(f) {
     try {
+        if (!window.XLSX) throw new Error('Lecture Excel indisponible (bibliothèque non chargée). Rechargez la page.');
         const wb = XLSX.read(await f.arrayBuffer());
-        const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: false }).slice(1).filter(r => r.some(Boolean));
+        const toutes = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: false });
+        const entete = (toutes[0] || []).map(v => String(v).trim().toLowerCase());
+        if (!entete[0]?.startsWith('commercial') || !entete[1]?.startsWith('n')) throw new Error('Format non reconnu : la 1re colonne doit être « Commercial » et la 2e « N° ». Utilisez le modèle Excel.');
+        const rows = toutes.slice(1).filter(r => r.some(Boolean));
         const t = v => String(v ?? '').replace(/\s+/g, ' ').trim();
         const cap = v => t(v).toLowerCase().replace(/(^|[\s-])\S/g, m => m.toUpperCase());
         const data = rows.map(r => {
@@ -208,10 +222,45 @@ async function importer(f) {
             return { atc: cap(r[0]), numero: t(r[1]), raison: t(r[2]), statut: t(r[3]).toUpperCase(), contact_nom: t(r[4]).toUpperCase(), contact_prenom: cap(r[5]),
                 mail: t(r[6]).split(/[;/,\s]+/).filter(m => m.includes('@')).join('; ').toLowerCase(), portable: tel.length === 10 ? tel.replace(/(\d\d)(?=\d)/g, '$1 ') : t(r[7]),
                 adresse: t(r[8]), cp: /^\d{4}$/.test(cp) ? '0' + cp : cp, ville: t(r[10]).toUpperCase() };
-        }).filter(r => r.atc && r.numero && r.raison);
-        if (!data.length) throw new Error('Aucune ligne reconnue dans le fichier.');
-        if (!confirm(`${data.length} IAP trouvés. Remplacer le listing actuel ? (le suivi des IAP existants est conservé)`)) return;
-        const r = await API.importer(data);
-        toast(`${r.lignes} IAP importés`); charger();
+        });
+        const ok = data.filter(r => r.atc && r.numero && r.raison), ignorees = data.length - ok.length;
+        if (!ok.length) throw new Error('Aucune ligne exploitable (il faut au moins Commercial, N° et Nom).');
+        apercu(f.name, ok, ignorees);
     } catch (e) { toast(e.message, true); }
+}
+
+// Aperçu des changements avant de remplacer le listing
+function apercu(nom, data, ignorees) {
+    const cle = r => r.numero + '|' + r.raison;
+    const actuels = new Map(S.data.iap.map(i => [cle(i), i])), fichier = new Set(data.map(cle));
+    const champs = ['atc', 'statut', 'contact_nom', 'contact_prenom', 'mail', 'portable', 'adresse', 'cp', 'ville'];
+    const nouveaux = data.filter(r => !actuels.has(cle(r)));
+    const modifies = data.filter(r => { const a = actuels.get(cle(r)); return a && champs.some(k => (a[k] || '') !== (r[k] || '')); });
+    const retires = S.data.iap.filter(i => !fichier.has(cle(i)));
+    const retiresSuivis = retires.filter(i => Object.keys(i.suivi || {}).length);
+    const atcConnus = new Set(S.data.atc.map(a => a.nom)), atcNouveaux = [...new Set(data.map(r => r.atc))].filter(a => !atcConnus.has(a));
+    const changeAtc = data.filter(r => { const a = actuels.get(cle(r)); return a && a.atc !== r.atc; });
+    const liste = (arr, f) => arr.length ? `<ul>${arr.slice(0, 50).map(x => `<li>${f(x)}</li>`).join('')}${arr.length > 50 ? `<li>… et ${arr.length - 50} autres</li>` : ''}</ul>` : '';
+    $('#impSheet').innerHTML = `<header><h3>Importer « ${esc(nom)} »</h3><button class="btn sm ghost" data-close>✕</button></header>
+    <div class="body imp">
+        <div class="grid">
+            <div><b>${data.length}</b>IAP dans le fichier</div><div><b>${nouveaux.length}</b>nouveaux</div><div><b>${modifies.length}</b>mis à jour</div><div><b>${retires.length}</b>retirés</div>
+        </div>
+        ${ignorees ? `<div class="warn">${ignorees} ligne(s) ignorée(s) : Commercial, N° ou Nom manquant.</div>` : ''}
+        ${retiresSuivis.length ? `<div class="warn">⚠️ ${retiresSuivis.length} IAP retiré(s) ont déjà un suivi (appel, mail, commande…) : il sera supprimé avec eux.</div>` : ''}
+        ${atcNouveaux.length ? `<p><b>Nouveaux ATC</b> (un code d’accès sera créé) : ${atcNouveaux.map(esc).join(', ')}</p>` : ''}
+        ${changeAtc.length ? `<p><b>${changeAtc.length} IAP changent d’ATC</b>${liste(changeAtc, r => `${esc(r.raison)} : ${esc(actuels.get(cle(r)).atc)} → ${esc(r.atc)}`)}</p>` : ''}
+        ${nouveaux.length ? `<p><b>Nouveaux IAP</b>${liste(nouveaux, r => `${esc(r.raison)} · ${esc(r.atc)}`)}</p>` : ''}
+        ${retires.length ? `<p><b>IAP retirés</b>${liste(retires, i => `${esc(i.raison)} · ${esc(i.atc)}`)}</p>` : ''}
+        <p class="muted" style="font-size:13px">Le suivi des IAP conservés est gardé. Les IAP sont reconnus par leur N° client et leur nom.</p>
+        <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn" data-close>Annuler</button><button class="btn primary" id="impGo">Importer ${data.length} IAP</button></div>
+    </div>`;
+    $('#impModal').classList.remove('hidden');
+    $('#impGo').onclick = async () => {
+        const b = $('#impGo'); b.disabled = true; b.textContent = 'Import en cours…';
+        try {
+            const r = await API.importer(data); fermerImp();
+            toast(`${r.lignes} IAP importés · ${nouveaux.length} nouveaux, ${retires.length} retirés`); await charger();
+        } catch (e) { toast(e.message, true); b.disabled = false; b.textContent = `Importer ${data.length} IAP`; }
+    };
 }

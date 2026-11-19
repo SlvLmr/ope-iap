@@ -70,7 +70,9 @@
     @media (max-width: 760px) { .obj { grid-template-columns: 1fr; gap: 16px; } .obj .big { font-size: 28px; } }
 
     /* Fiche IAP */
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+    .grid2 > *, .bloc, .sheet .body { min-width: 0; }
+    .coord a { overflow-wrap: anywhere; }
     .bloc { border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
     .bloc h4 { margin: 0 0 12px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
     .coord { display: grid; gap: 6px; font-size: 14px; }
@@ -84,8 +86,9 @@
     .stepsBig { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .stepsBig .stp { width: auto; padding: 10px 0; }
 
-    /* Kit : mail type & bon */
+    /* Kit : mail type & bon de commande */
     .kitgrid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+    .kitgrid > .card:first-child { grid-row: span 2; }
     .kh { padding: 18px 18px 0; } .kh h3 { margin: 0; font-size: 18px; } .kh p { margin: 4px 0 0; font-size: 13px; }
     .kobj { margin: 14px 18px 0; background: var(--surface-2); border-radius: 12px; padding: 10px 12px; font-size: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .kobj b { flex: 1; min-width: 180px; }
@@ -109,9 +112,21 @@
         .iap { grid-template-columns: 1fr auto; grid-template-areas: 'who more' 'steps steps' 'when mt'; gap: 12px; }
         .iap .who { grid-area: who; } .iap .steps { grid-area: steps; } .iap .when { grid-area: when; } .iap .mt { grid-area: mt; align-self: end; } .iap .more { grid-area: more; }
         .steps .stp { flex: 1; width: auto; }
-        .grid2 { grid-template-columns: 1fr; }
+        .grid2 { grid-template-columns: minmax(0, 1fr); }
     }
-    @media (max-width: 520px) { .qte .l { grid-template-columns: 1fr 70px 70px; } .qte .l .pu { display: none; } .stepsBig { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) {
+        .qte .l { grid-template-columns: minmax(0, 1fr) 64px 84px; } .qte .l .pu { display: none; } .stepsBig { grid-template-columns: 1fr 1fr; }
+        .modal { padding: 0; place-items: end stretch; }
+        .modal .sheet { max-width: none; max-height: 94vh; border-radius: 20px 20px 0 0; }
+        .modal .sheet header { padding: 14px 16px; } .modal .sheet header h3 { font-size: 16px; }
+        .modal .sheet .body { padding: 14px 16px 24px; }
+        .bloc { padding: 14px; }
+        .actions .btn { flex: 1 1 100%; }
+        .iap { padding: 14px; }
+        .steps { gap: 4px; } .stp { padding: 6px 0 4px; } .stp .n { font-size: 10px; }
+        .kobj b { min-width: 0; } .kapercu { padding: 12px; margin: 12px; } .kact .btn { flex: 1 1 100%; }
+        .tools .input { max-width: none; }
+    }
 </style>
 </head>
 <body>
@@ -145,7 +160,7 @@
             <div><h1 id="bonjour">Bonjour</h1><p id="sous"></p></div>
             <div class="tabs" id="vues">
                 <button class="tab on" data-v="todo">To-do phoning</button>
-                <button class="tab" data-v="kit">Mail type & bon</button>
+                <button class="tab" data-v="kit">Mail, bon de commande & post</button>
                 <button class="tab" data-v="args">Argumentaire & prix</button>
             </div>
         </div>
@@ -173,8 +188,14 @@
                 <div class="card kbon">
                     <h3>🧾 Bon de commande</h3>
                     <p class="muted">Les 6 références avec prix tarif, prix opé et remise. Les quantités calculent le total. À enregistrer en PDF et joindre au mail.</p>
-                    <a class="btn primary" id="kBon" href="bon.html" target="_blank">Ouvrir un bon vierge</a>
+                    <a class="btn primary" id="kBon" href="bon.html" target="_blank">Ouvrir un bon de commande vierge</a>
                     <p class="muted" style="font-size:12px;margin-top:14px">Pour un bon prérempli avec les coordonnées de l’IAP et les quantités : bouton « Bon de commande prérempli » dans sa fiche.</p>
+                </div>
+                <div class="card kbon">
+                    <h3>📱 Post réseaux sociaux</h3>
+                    <p class="muted">À proposer à tes IAP pour leurs pages Facebook, Instagram ou LinkedIn. Il parle de sécurité, pas de la promo.</p>
+                    <div id="kPost" style="white-space:pre-wrap;font-size:13.5px;line-height:1.5;background:var(--surface-2);border-radius:12px;padding:14px;margin-bottom:12px"></div>
+                    <button class="btn primary" id="kPostCop">Copier le post</button>
                 </div>
             </div>
         </section>

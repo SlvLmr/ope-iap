@@ -53,6 +53,11 @@
     #objectifs input { height: 34px; border-radius: 10px; border: 1px solid var(--line-2); padding: 0 10px; width: 140px; text-align: right; font-variant-numeric: tabular-nums; }
     #objectifs input.p { width: 120px; text-align: left; }
     .neg { color: var(--ok-ink); font-weight: 700; }
+    .imp ul { margin: 6px 0 0; padding-left: 18px; font-size: 13px; color: var(--text-2); max-height: 160px; overflow: auto; }
+    .imp .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 4px 0 16px; }
+    .imp .grid div { background: var(--surface-2); border-radius: 12px; padding: 12px; } .imp .grid b { display: block; font-size: 24px; }
+    .imp .warn { background: var(--warn-soft); border-radius: 12px; padding: 12px 14px; font-size: 13px; margin-bottom: 14px; }
+    @media (max-width: 640px) { .head h1 { font-size: 24px; } #btnImport { width: 100%; } }
     .drop { border: 2px dashed var(--line-2); border-radius: 16px; padding: 26px; text-align: center; color: var(--text-2); cursor: pointer; }
     .drop:hover { border-color: var(--accent); }
     @media (max-width: 900px) { .row2 { grid-template-columns: 1fr; } }
@@ -84,10 +89,13 @@
     <div class="wrap">
         <div class="head">
             <div><h1>Coup de boost pour les ATC</h1><p id="maj"></p></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <button class="btn primary hidden" id="btnImport">⬆ Importer le fichier des IAP</button>
             <div class="tabs" id="vues">
                 <button class="tab on" data-v="board">Tableau de bord</button>
                 <button class="tab" data-v="detail">Détail des IAP</button>
-                <button class="tab hidden" data-v="codes" id="tabCodes">Codes & listing</button>
+                <button class="tab hidden" data-v="codes" id="tabCodes">Codes, objectifs & import</button>
+            </div>
             </div>
         </div>
 
@@ -128,10 +136,13 @@
             <div class="card" style="margin-top:16px"><div class="hd"><h3>Mettre à jour le listing IAP</h3></div><div class="bd">
                 <p class="muted" style="margin:0 0 12px;font-size:13px">Fichier Excel au même format que « Listing IAP 2026 » (colonnes Commercial, N°, Nom, Statut 2026, Nom, Prénom, Mail, Portable, Adresse, CP, Ville). Le suivi déjà saisi est conservé pour les IAP existants. Un code est créé pour chaque nouvel ATC.</p>
                 <label class="drop" id="drop">Déposer le fichier ici ou cliquer pour le choisir<input type="file" id="file" accept=".xlsx,.xls" hidden></label>
+                <div style="margin-top:12px"><button class="btn sm" id="modele">⬇ Télécharger le modèle Excel</button></div>
             </div></div>
         </section>
     </div>
 </div>
+
+<div class="modal hidden" id="impModal"><div class="sheet" id="impSheet"></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="config.js"></script>

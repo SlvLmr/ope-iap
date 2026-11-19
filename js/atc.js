@@ -47,14 +47,16 @@ document.querySelectorAll('#vues .tab').forEach(b => b.onclick = () => {
 });
 const signature = () => [A.moi?.prenom, A.moi?.nom].filter(Boolean).join(' ');
 
-// ─── Kit : mail type & bon vierge ───
+// ─── Kit : mail type & bon de commande vierge ───
 function rendreKit() {
     $('#kObjet').textContent = mailObjet();
     $('#kApercu').innerHTML = mailHtml(MAIL_MODELE_IAP, signature());
     $('#kBon').href = 'bon.html#' + encodeURIComponent(JSON.stringify({ atc: signature() }));
+    $('#kPost').textContent = POST_RS;
 }
 $('#kCop').onclick = async () => toast((await copierMail(MAIL_MODELE_IAP, signature())) === 'html' ? 'Mail copié : colle-le dans Outlook ✓' : 'Mail copié (texte) ✓');
 $('#kCopTxt').onclick = async () => { await copierMail(MAIL_MODELE_IAP, signature(), true); toast('Texte copié ✓'); };
+$('#kPostCop').onclick = async () => { await navigator.clipboard.writeText(POST_RS); toast('Post copié ✓ à coller sur la page de l’IAP'); };
 $('#kCopObj').onclick = async () => { await navigator.clipboard.writeText(mailObjet()); toast('Objet copié ✓'); };
 $('#q').oninput = e => { A.q = e.target.value.trim().toLowerCase(); rendreListe(); };
 

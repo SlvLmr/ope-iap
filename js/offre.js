@@ -157,3 +157,13 @@ async function copierMail(iap, atc, texteSeul) {
 }
 // Modèle générique (le mail ne dépend pas de l'IAP)
 const MAIL_MODELE_IAP = {};
+
+// ─── Post réseaux sociaux pour les pages des IAP (sans parler de promo) ───
+const POST_RS = `Les jours raccourcissent… et les risques d'intrusion augmentent. ⚠️🔑
+
+À la maison comme au travail, une porte ou une serrure fragilisée peut vite devenir une faille. C'est le bon moment pour vérifier que vos accès sont réellement à la hauteur.
+Nous intervenons chez vous pour sécuriser vos portes, vous conseiller sur les niveaux de protection adaptés et assurer une pose dans les règles de l'art.
+
+Parlons de votre sécurité dès maintenant :
+📱 Contactez-nous.
+#SécuritéMaison #SécuritéEntreprise #SerrurierAgréé #Vigilance #PicardSerrures`;

@@ -12,7 +12,7 @@ Opération flash sur les serrures de sécurité, réservée au réseau des Insta
 | `bon.html` | Bon de commande imprimable (prérempli depuis l’espace ATC), bloc « Bon pour accord » éditable : signataire, qualité, lieu, date, signature à main levée, cachet en image | Libre, vide par défaut |
 
 ### Présentation
-Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glisser sur mobile. Les prix et remises sont calculés à partir de `js/offre.js`. Bouton **PDF** (ou touche `P`) : export une slide par page. Slide « Le kit » : un clic sur *Mail type* affiche le mail prêt à copier, *Bon de commande* ouvre le bon, *Fiches produits* renvoie aux slides produits.
+Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glisser sur mobile. Les prix et remises sont calculés à partir de `js/offre.js`. Bouton **PDF** (ou touche `P`) : export une slide par page. Slide « Le kit » : un clic sur *Mail type* affiche le mail prêt à copier, *Bon de commande* ouvre le bon, *Fiches produits* renvoie aux slides produits, *Post réseaux sociaux* affiche le post à copier. Sur téléphone, les slides s’empilent et se lisent en faisant défiler.
 
 ### Espace ATC
 - **Objectif annuel** : CA actuel, objectif, reste à faire, et ce que les commandes de l’opération y apportent.
@@ -20,14 +20,16 @@ Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glis
 - To-do par IAP : **Date / Appel / Mail / Présentation / Commande**. Chaque étape cochée est datée automatiquement.
 - Filtres : à traiter, à rappeler, pas encore appelés, commandés.
 - Fiche IAP : mail « Proposition et tarification suite à notre échange téléphonique » prérempli (messagerie ou copie mise en forme pour Outlook), bon de commande prérempli, saisie des quantités (montant calculé aux prix promo), date de rappel, commentaire.
-- Onglet *Mail type & bon* : le mail type signé au nom de l’ATC (copie mise en forme ou texte) et un bon de commande vierge à son nom.
+- Onglet *Mail, bon de commande & post* : le mail type signé au nom de l’ATC (copie mise en forme ou texte), un bon de commande vierge à son nom et le post réseaux sociaux à copier pour les IAP.
 - Onglet *Argumentaire & prix* : fiches produits issues de picard-serrures.com.
 - Lien direct : `atc.html#code=XXXX-XXXX` connecte l’ATC sans saisie.
 
 ### Suivi
 - Indicateurs (CA, commandes, serrures vendues, panier moyen, IAP appelés, reste à faire des ATC), entonnoir, ventes par référence, classement des ATC avec CA actuel / objectif / reste à faire / atteinte, activité récente. Actualisation chaque minute.
 - Détail de tous les IAP, filtres, **exports Excel** (commandes pour l’ADV, suivi complet).
-- Direction uniquement : **objectifs annuels** (CA actuel et objectif par ATC, modifiables), **codes d’accès** (copier les liens, régénérer, désactiver, créer) et **import du listing IAP** (même format que « Listing IAP 2026 »).
+- Direction uniquement : bouton **« Importer le fichier des IAP »** en haut de page (aperçu avant validation : nouveaux, mis à jour, retirés, changements d’ATC ; modèle Excel téléchargeable), **objectifs annuels** (CA actuel et objectif par ATC, modifiables), **codes d’accès** (copier les liens, régénérer, désactiver, créer) et **import du listing IAP** (même format que « Listing IAP 2026 »).
+
+Toutes les pages sont utilisables sur téléphone (bon de commande compris : une carte par référence).
 
 ## Données et sécurité
 
