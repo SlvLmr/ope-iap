@@ -95,6 +95,7 @@
     .kapercu { margin: 12px 18px; border: 1px solid var(--line); border-radius: 12px; padding: 18px; max-height: 460px; overflow: auto; }
     .kact { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 18px 12px; }
     .kbon { padding: 18px; } .kbon h3 { margin: 0 0 6px; font-size: 18px; } .kbon p { font-size: 13px; margin: 0 0 14px; }
+    .kvid { width: 100%; max-width: 320px; aspect-ratio: 9 / 16; border-radius: 14px; background: #000; display: block; margin: 0 auto; }
     @media (max-width: 900px) { .kitgrid { grid-template-columns: 1fr; } }
 
     /* Argumentaire */
@@ -192,10 +193,13 @@
                     <p class="muted" style="font-size:12px;margin-top:14px">Pour un bon prérempli avec les coordonnées de l’IAP et les quantités : bouton « Bon de commande prérempli » dans sa fiche.</p>
                 </div>
                 <div class="card kbon">
-                    <h3>📱 Post réseaux sociaux</h3>
-                    <p class="muted">À proposer à tes IAP pour leurs pages Facebook, Instagram ou LinkedIn. Il parle de sécurité, pas de la promo.</p>
+                    <h3>🎬 Post & vidéo réseaux sociaux</h3>
+                    <p class="muted">À proposer à tes IAP pour leurs pages Facebook, Instagram, TikTok ou LinkedIn : un short de 20 s et son texte. Ils parlent de sécurité, pas de la promo.</p>
+                    <video class="kvid" src="short/short-coup-de-boost.mp4" poster="short/poster.jpg" controls playsinline preload="none"></video>
+                    <a class="btn primary" style="width:100%;margin:10px 0 16px" href="short/short-coup-de-boost.mp4" download="Picard-short-securite-20s.mp4">⬇ Télécharger la vidéo (MP4, 20 s)</a>
                     <div id="kPost" style="white-space:pre-wrap;font-size:13.5px;line-height:1.5;background:var(--surface-2);border-radius:12px;padding:14px;margin-bottom:12px"></div>
-                    <button class="btn primary" id="kPostCop">Copier le post</button>
+                    <button class="btn" style="width:100%" id="kPostCop">Copier le texte du post</button>
+                    <p class="muted" style="font-size:12px;margin:10px 0 0">Vidéo sans musique : l’IAP en ajoute une dans l’application au moment de publier.</p>
                 </div>
             </div>
         </section>

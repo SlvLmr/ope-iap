@@ -12,7 +12,7 @@ Opération flash sur les serrures de sécurité, réservée au réseau des Insta
 | `bon.html` | Bon de commande imprimable (prérempli depuis l’espace ATC), bloc « Bon pour accord » éditable : signataire, qualité, lieu, date, signature à main levée, cachet en image | Libre, vide par défaut |
 
 ### Présentation
-Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glisser sur mobile. Les prix et remises sont calculés à partir de `js/offre.js`. Bouton **PDF** (ou touche `P`) : export une slide par page. Slide « Le kit » : un clic sur *Mail type* affiche le mail prêt à copier, *Bon de commande* ouvre le bon, *Fiches produits* renvoie aux slides produits, *Post réseaux sociaux* affiche le post à copier. Sur téléphone, les slides s’empilent et se lisent en faisant défiler.
+Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glisser sur mobile. Les prix et remises sont calculés à partir de `js/offre.js`. Bouton **PDF** (ou touche `P`) : export une slide par page. Slide « Le kit » : un clic sur *Mail type* affiche le mail prêt à copier, *Bon de commande* ouvre le bon, *Fiches produits* renvoie aux slides produits, *Post & vidéo réseaux sociaux* affiche le post à copier et le short vidéo à télécharger. Sur téléphone, les slides s’empilent et se lisent en faisant défiler.
 
 ### Espace ATC
 - **Objectif annuel** : CA actuel, objectif, reste à faire, et ce que les commandes de l’opération y apportent.
@@ -20,7 +20,7 @@ Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glis
 - To-do par IAP : **Date / Appel / Mail / Présentation / Commande**. Chaque étape cochée est datée automatiquement.
 - Filtres : à traiter, à rappeler, pas encore appelés, commandés.
 - Fiche IAP : mail « Proposition et tarification suite à notre échange téléphonique » prérempli (messagerie ou copie mise en forme pour Outlook), bon de commande prérempli, saisie des quantités (montant calculé aux prix promo), date de rappel, commentaire.
-- Onglet *Mail, bon de commande & post* : le mail type signé au nom de l’ATC (copie mise en forme ou texte), un bon de commande vierge à son nom et le post réseaux sociaux à copier pour les IAP.
+- Onglet *Mail, bon de commande & post* : le mail type signé au nom de l’ATC (copie mise en forme ou texte), un bon de commande vierge à son nom le post réseaux sociaux à copier et le short vidéo à télécharger pour les IAP.
 - Onglet *Argumentaire & prix* : fiches produits issues de picard-serrures.com.
 - Lien direct : `atc.html#code=XXXX-XXXX` connecte l’ATC sans saisie.
 

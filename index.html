@@ -152,6 +152,11 @@
     .kit .apercu { padding: 22px; overflow: auto; flex: 1; }
     .kit footer { padding: 14px 22px; border-top: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .kit footer .muted { font-size: 12px; flex: 1; min-width: 200px; }
+    .postgrid { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 22px; align-items: start; }
+    .postgrid .vid { display: grid; gap: 10px; }
+    .postgrid video { width: 100%; aspect-ratio: 9 / 16; border-radius: 16px; background: #000; display: block; }
+    .postgrid .btn { width: 100%; }
+    @media (max-width: 700px) { .postgrid { grid-template-columns: 1fr; } .postgrid video { max-height: 60vh; width: auto; margin: 0 auto; } }
 
 
     /* ─── Téléphone (portrait) : slides empilées, lecture au défilement ─── */
@@ -366,7 +371,7 @@
         <button class="tile action" data-kit="mail"><div class="ico">✉️</div><h3>Mail type</h3><p>Le mail de l’opération pour nos IAP, prêt à copier ou à ouvrir dans Outlook.</p><span class="go">Voir et copier le mail →</span></button>
         <a class="tile action" href="bon.html" target="_blank"><div class="ico">🧾</div><h3>Bon de commande</h3><p>Prérempli avec les coordonnées de l’IAP et les 6 références, total calculé.</p><span class="go">Ouvrir le bon de commande →</span></a>
         <button class="tile action" data-kit="fiches"><div class="ico">🔒</div><h3>Fiches produits</h3><p>Arguments clés de Présence 2, Présence 3 et Sérénis 710, issus de notre site.</p><span class="go">Voir les fiches →</span></button>
-        <button class="tile action" data-kit="post"><div class="ico">📱</div><h3>Post réseaux sociaux</h3><p>Sur les pages de nos IAP : la sécurité et les cambriolages, sans parler de promo.</p><span class="go">Voir et copier le post →</span></button>
+        <button class="tile action" data-kit="post"><div class="ico">🎬</div><h3>Post & vidéo réseaux sociaux</h3><p>Pour les pages de nos IAP : le post et un short vidéo de 20 s sur la sécurité, sans parler de promo.</p><span class="go">Voir, copier, télécharger →</span></button>
     </div>
 </section>
 
@@ -401,10 +406,15 @@
         <button class="btn" id="kitCopTxt">Copier en texte</button><button class="btn primary" id="kitCop">Copier le mail (mise en forme)</button></footer>
 </div></div>
 
-<div class="kit hidden" id="kitPost"><div class="sheet" style="max-width:620px">
-    <header><h3>📱 Post réseaux sociaux · pages des IAP</h3><button class="btn sm ghost" data-close>✕</button></header>
-    <div class="apercu"><div id="postTxt" style="white-space:pre-wrap;font-size:15px;line-height:1.55;background:var(--surface-2);border-radius:14px;padding:18px"></div></div>
-    <footer><span class="muted">À publier sur les pages Facebook, Instagram ou LinkedIn des IAP. Pas de mention de la promo.</span><button class="btn primary" id="postCop">Copier le post</button></footer>
+<div class="kit hidden" id="kitPost"><div class="sheet" style="max-width:960px">
+    <header><h3>🎬 Post & vidéo réseaux sociaux · pages des IAP</h3><button class="btn sm ghost" data-close>✕</button></header>
+    <div class="apercu postgrid">
+        <div class="vid"><video id="postVid" src="short/short-coup-de-boost.mp4" poster="short/poster.jpg" controls playsinline preload="none"></video>
+            <a class="btn primary" href="short/short-coup-de-boost.mp4" download="Picard-short-securite-20s.mp4">⬇ Télécharger la vidéo (MP4, 20 s)</a></div>
+        <div><div id="postTxt" style="white-space:pre-wrap;font-size:15px;line-height:1.55;background:var(--surface-2);border-radius:14px;padding:18px"></div>
+            <button class="btn primary" id="postCop" style="margin-top:12px">Copier le post</button></div>
+    </div>
+    <footer><span class="muted">À publier sur Facebook, Instagram, TikTok ou LinkedIn : la vidéo en Reel / Short, le post en texte d’accompagnement. Vidéo sans musique : en ajouter une dans l’application.</span></footer>
 </div></div>
 
 <nav class="nav">
@@ -447,7 +457,7 @@ document.getElementById('kitObjet').textContent = mailObjet();
 document.getElementById('kitApercu').innerHTML = mailHtml(MAIL_MODELE_IAP, SIGN);
 const kitPost = document.getElementById('kitPost');
 document.getElementById('postTxt').textContent = POST_RS;
-const ouvrirKit = (k = kit) => k.classList.remove('hidden'), fermerKit = () => { kit.classList.add('hidden'); kitPost.classList.add('hidden'); };
+const ouvrirKit = (k = kit) => k.classList.remove('hidden'), fermerKit = () => { kit.classList.add('hidden'); kitPost.classList.add('hidden'); document.getElementById('postVid').pause(); };
 const kitOuvert = () => !kit.classList.contains('hidden') || !kitPost.classList.contains('hidden');
 kitPost.addEventListener('click', e => { if (e.target === kitPost || e.target.closest('[data-close]')) fermerKit(); });
 document.getElementById('postCop').onclick = async e => { await navigator.clipboard.writeText(POST_RS); e.target.textContent = 'Copié ✓'; setTimeout(() => e.target.textContent = 'Copier le post', 1800); };
