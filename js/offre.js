@@ -9,7 +9,7 @@ const OPE = {
     debut: '2026-11-23',
     fin: '2026-11-27T18:00:00+01:00',
     finTexte: 'du 23 au 27 novembre 2026 (jusqu’à 18h)',
-    visio: 'Jeudi 20 novembre — visio 30 min ATC + ADV',
+    visio: 'Vendredi 20 novembre — visio 30 min ATC + ADV',
     livraison: 'Toutes les commandes saisies pendant l’opération sont livrées avant la fin de l’année 2026.',
 };
 
