@@ -84,6 +84,16 @@
     .stepsBig { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .stepsBig .stp { width: auto; padding: 10px 0; }
 
+    /* Kit : mail type & bon */
+    .kitgrid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+    .kh { padding: 18px 18px 0; } .kh h3 { margin: 0; font-size: 18px; } .kh p { margin: 4px 0 0; font-size: 13px; }
+    .kobj { margin: 14px 18px 0; background: var(--surface-2); border-radius: 12px; padding: 10px 12px; font-size: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .kobj b { flex: 1; min-width: 180px; }
+    .kapercu { margin: 12px 18px; border: 1px solid var(--line); border-radius: 12px; padding: 18px; max-height: 460px; overflow: auto; }
+    .kact { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 18px 12px; }
+    .kbon { padding: 18px; } .kbon h3 { margin: 0 0 6px; font-size: 18px; } .kbon p { font-size: 13px; margin: 0 0 14px; }
+    @media (max-width: 900px) { .kitgrid { grid-template-columns: 1fr; } }
+
     /* Argumentaire */
     .fiches { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
     .fiche { overflow: hidden; }
@@ -135,6 +145,7 @@
             <div><h1 id="bonjour">Bonjour</h1><p id="sous"></p></div>
             <div class="tabs" id="vues">
                 <button class="tab on" data-v="todo">To-do phoning</button>
+                <button class="tab" data-v="kit">Mail type & bon</button>
                 <button class="tab" data-v="args">Argumentaire & prix</button>
             </div>
         </div>
@@ -148,6 +159,24 @@
                 <input class="input" id="q" placeholder="Rechercher un IAP, une ville…">
             </div>
             <div class="list" id="list"></div>
+        </section>
+
+        <section id="vKit" class="hidden">
+            <div class="kitgrid">
+                <div class="card">
+                    <div class="kh"><div><h3>✉️ Mail type</h3><p class="muted">« Proposition et tarification suite à notre échange téléphonique ». Signé à ton nom : il reste à remplacer [Prénom].</p></div></div>
+                    <div class="kobj"><span class="muted">Objet :</span> <b id="kObjet"></b><button class="btn sm" id="kCopObj">Copier l’objet</button></div>
+                    <div class="kapercu" id="kApercu"></div>
+                    <div class="kact"><button class="btn primary" id="kCop">Copier le mail (mise en forme)</button><button class="btn" id="kCopTxt">Copier en texte</button></div>
+                    <p class="muted" style="font-size:12px;margin:0 18px 18px">Astuce : depuis la fiche d’un IAP (bouton ›), le mail est déjà personnalisé avec son prénom et s’ouvre dans ta messagerie.</p>
+                </div>
+                <div class="card kbon">
+                    <h3>🧾 Bon de commande</h3>
+                    <p class="muted">Les 6 références avec prix tarif, prix opé et remise. Les quantités calculent le total. À enregistrer en PDF et joindre au mail.</p>
+                    <a class="btn primary" id="kBon" href="bon.html" target="_blank">Ouvrir un bon vierge</a>
+                    <p class="muted" style="font-size:12px;margin-top:14px">Pour un bon prérempli avec les coordonnées de l’IAP et les quantités : bouton « Bon de commande prérempli » dans sa fiche.</p>
+                </div>
+            </div>
         </section>
 
         <section id="vArgs" class="hidden">

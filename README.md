@@ -12,7 +12,7 @@ Opération flash sur les serrures de sécurité, réservée au réseau des Insta
 | `bon.html` | Bon de commande imprimable (prérempli depuis l’espace ATC) | Libre, vide par défaut |
 
 ### Présentation
-Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glisser sur mobile. Les prix et remises sont calculés à partir de `js/offre.js`.
+Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glisser sur mobile. Les prix et remises sont calculés à partir de `js/offre.js`. Bouton **PDF** (ou touche `P`) : export une slide par page. Slide « Le kit » : un clic sur *Mail type* affiche le mail prêt à copier, *Bon de commande* ouvre le bon, *Fiches produits* renvoie aux slides produits.
 
 ### Espace ATC
 - **Objectif annuel** : CA actuel, objectif, reste à faire, et ce que les commandes de l’opération y apportent.
@@ -20,6 +20,7 @@ Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glis
 - To-do par IAP : **Date / Appel / Mail / Présentation / Commande**. Chaque étape cochée est datée automatiquement.
 - Filtres : à traiter, à rappeler, pas encore appelés, commandés.
 - Fiche IAP : mail « Proposition et tarification suite à notre échange téléphonique » prérempli (messagerie ou copie mise en forme pour Outlook), bon de commande prérempli, saisie des quantités (montant calculé aux prix promo), date de rappel, commentaire.
+- Onglet *Mail type & bon* : le mail type signé au nom de l’ATC (copie mise en forme ou texte) et un bon de commande vierge à son nom.
 - Onglet *Argumentaire & prix* : fiches produits issues de picard-serrures.com.
 - Lien direct : `atc.html#code=XXXX-XXXX` connecte l’ATC sans saisie.
 

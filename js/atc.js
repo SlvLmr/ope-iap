@@ -42,8 +42,20 @@ async function charger() {
 document.querySelectorAll('#vues .tab').forEach(b => b.onclick = () => {
     document.querySelectorAll('#vues .tab').forEach(x => x.classList.toggle('on', x === b));
     $('#vTodo').classList.toggle('hidden', b.dataset.v !== 'todo');
+    $('#vKit').classList.toggle('hidden', b.dataset.v !== 'kit');
     $('#vArgs').classList.toggle('hidden', b.dataset.v !== 'args');
 });
+const signature = () => [A.moi?.prenom, A.moi?.nom].filter(Boolean).join(' ');
+
+// ─── Kit : mail type & bon vierge ───
+function rendreKit() {
+    $('#kObjet').textContent = mailObjet();
+    $('#kApercu').innerHTML = mailHtml(MAIL_MODELE_IAP, signature());
+    $('#kBon').href = 'bon.html#' + encodeURIComponent(JSON.stringify({ atc: signature() }));
+}
+$('#kCop').onclick = async () => toast((await copierMail(MAIL_MODELE_IAP, signature())) === 'html' ? 'Mail copié : colle-le dans Outlook ✓' : 'Mail copié (texte) ✓');
+$('#kCopTxt').onclick = async () => { await copierMail(MAIL_MODELE_IAP, signature(), true); toast('Texte copié ✓'); };
+$('#kCopObj').onclick = async () => { await navigator.clipboard.writeText(mailObjet()); toast('Objet copié ✓'); };
 $('#q').oninput = e => { A.q = e.target.value.trim().toLowerCase(); rendreListe(); };
 
 const FILTRES = [
@@ -54,7 +66,7 @@ const FILTRES = [
     { k: 'tous', nom: 'Tous', f: () => true },
 ];
 
-function rendre() { rendreKpis(); rendreFiltres(); rendreListe(); rendreArgs(); }
+function rendre() { rendreKpis(); rendreFiltres(); rendreListe(); rendreArgs(); rendreKit(); }
 
 // Objectif annuel : CA actuel, objectif, reste à faire, et ce que l'opération y apporte
 function rendreObjectif(caOpe) {
@@ -233,17 +245,17 @@ function rendreFiche(i, garderSaisie) {
     $('#fCmdAnn') && ($('#fCmdAnn').onclick = async () => { await maj(i.id, { quantites: {}, commande: false }, true); toast('Commande annulée'); rendreFiche(i); });
     $('#fMail').onclick = () => {
         const to = (i.mail || '').split(';').map(m => m.trim()).filter(Boolean).join(',');
-        location.href = `mailto:${to}?subject=${encodeURIComponent(mailObjet())}&body=${encodeURIComponent(mailTexte(i, A.moi.nom))}`;
+        location.href = `mailto:${to}?subject=${encodeURIComponent(mailObjet())}&body=${encodeURIComponent(mailTexte(i, signature()))}`;
         if (!i.suivi?.mail) maj(i.id, { mail: true }, true).then(() => toast('Étape « Mail » cochée ✓'));
     };
     $('#fCopie').onclick = async () => {
         try {
-            await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([mailHtml(i, A.moi.nom)], { type: 'text/html' }), 'text/plain': new Blob([mailTexte(i, A.moi.nom)], { type: 'text/plain' }) })]);
+            await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([mailHtml(i, signature())], { type: 'text/html' }), 'text/plain': new Blob([mailTexte(i, signature())], { type: 'text/plain' }) })]);
             toast('Mail copié : colle-le dans Outlook (objet ci-dessous).');
-        } catch (e) { await navigator.clipboard.writeText(mailTexte(i, A.moi.nom)).catch(() => {}); toast('Mail copié (texte).'); }
+        } catch (e) { await navigator.clipboard.writeText(mailTexte(i, signature())).catch(() => {}); toast('Mail copié (texte).'); }
     };
     $('#fBon').onclick = () => {
-        const d = { iap: { raison: i.raison, numero: i.numero, contact: [i.contact_prenom, i.contact_nom].filter(Boolean).join(' '), mail: i.mail, portable: i.portable, adresse: i.adresse, cp: i.cp, ville: i.ville }, atc: A.moi.nom, q: lireQ() };
+        const d = { iap: { raison: i.raison, numero: i.numero, contact: [i.contact_prenom, i.contact_nom].filter(Boolean).join(' '), mail: i.mail, portable: i.portable, adresse: i.adresse, cp: i.cp, ville: i.ville }, atc: signature(), q: lireQ() };
         window.open('bon.html#' + encodeURIComponent(JSON.stringify(d)), '_blank');
     };
 }

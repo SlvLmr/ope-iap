@@ -138,3 +138,18 @@ function mailHtml(iap, atc) {
 <p style="${p}">Je reste à votre disposition pour tout complément d’information.</p>
 <p style="${p}">Bien cordialement,<br>${esc(atc || '')}<br>Picard Serrures</p>`;
 }
+
+// ─── Copie du mail (mise en forme pour Outlook, avec repli en texte brut) ───
+async function copierMail(iap, atc, texteSeul) {
+    const texte = mailTexte(iap, atc);
+    if (!texteSeul && window.ClipboardItem) {
+        try {
+            await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([mailHtml(iap, atc)], { type: 'text/html' }), 'text/plain': new Blob([texte], { type: 'text/plain' }) })]);
+            return 'html';
+        } catch (e) { /* repli ci-dessous */ }
+    }
+    await navigator.clipboard.writeText(texte);
+    return 'texte';
+}
+// Modèle générique : prénom et signature à compléter
+const MAIL_MODELE_IAP = { contact_prenom: '[Prénom]' };
