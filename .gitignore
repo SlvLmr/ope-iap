@@ -1,0 +1,5 @@
+# Le listing IAP contient des coordonnées : il ne doit jamais être publié ici.
+*.xlsx
+*.xls
+*.csv
+.DS_Store

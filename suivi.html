@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suivi opération IAP</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+    .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 6px 0 20px; }
+    .head h1 { margin: 0; font-size: 30px; letter-spacing: -.03em; }
+    .head p { margin: 4px 0 0; color: var(--text-2); }
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tab { height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface); font-weight: 600; font-size: 13px; cursor: pointer; }
+    .tab.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+    .card h3 { margin: 0; font-size: 16px; }
+    .card .hd { display: flex; align-items: center; gap: 10px; padding: 16px 18px 0; flex-wrap: wrap; }
+    .card .hd .sp { flex: 1; }
+    .card .bd { padding: 14px 18px 18px; }
+    .funnel { display: grid; gap: 10px; }
+    .funnel .f { display: grid; grid-template-columns: 110px 1fr 70px; gap: 12px; align-items: center; font-size: 14px; font-weight: 600; }
+    .funnel .t { height: 30px; background: var(--surface-2); border-radius: 10px; overflow: hidden; }
+    .funnel .t i { display: flex; align-items: center; height: 100%; background: var(--grad); border-radius: 10px; padding-left: 10px; color: #fff; font-size: 12px; font-weight: 700; min-width: 2px; transition: width .5s; }
+    .funnel .v { text-align: right; font-variant-numeric: tabular-nums; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    th { text-align: left; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    tr:last-child td { border-bottom: 0; }
+    th.r, td.r { text-align: right; }
+    tbody tr.click { cursor: pointer; }
+    tbody tr.click:hover td { background: var(--surface-2); }
+    .tbl { overflow-x: auto; }
+    .rk { width: 26px; height: 26px; border-radius: 8px; display: inline-grid; place-items: center; font-weight: 800; font-size: 12px; background: var(--surface-2); color: var(--text-2); }
+    .rk.g { background: var(--grad); color: #fff; }
+    .mini { display: flex; align-items: center; gap: 8px; min-width: 110px; }
+    .mini .t { flex: 1; height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+    .mini .t i { display: block; height: 100%; background: var(--grad); }
+    .mini span { font-size: 12px; color: var(--text-2); width: 34px; text-align: right; font-variant-numeric: tabular-nums; }
+    .dots { display: flex; gap: 4px; }
+    .dots i { width: 22px; height: 22px; border-radius: 7px; background: var(--surface-2); display: grid; place-items: center; font-size: 11px; font-style: normal; color: transparent; }
+    .dots i.on { background: var(--accent-soft); color: var(--accent-ink); }
+    .dots i.on.c { background: var(--ok-soft); color: var(--ok-ink); }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filters select, .filters input { height: 36px; border-radius: 999px; border: 1px solid var(--line-2); padding: 0 12px; background: var(--surface); font-size: 13px; }
+    .journal { display: grid; gap: 0; max-height: 420px; overflow: auto; }
+    .journal div { padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; display: flex; gap: 10px; }
+    .journal time { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; width: 92px; flex: none; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; letter-spacing: .08em; background: var(--surface-2); padding: 3px 8px; border-radius: 8px; }
+    .drop { border: 2px dashed var(--line-2); border-radius: 16px; padding: 26px; text-align: center; color: var(--text-2); cursor: pointer; }
+    .drop:hover { border-color: var(--accent); }
+    @media (max-width: 900px) { .row2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="login" id="login">
+    <form class="box" id="loginForm">
+        <img class="logo" src="img/logo-picard.png" alt="Picard Serrures">
+        <h1>Suivi de l’opération<br><span class="grad-text">Coup de boost</span></h1>
+        <p>Accès direction et ADV. Saisissez votre code.</p>
+        <input class="input" id="code" placeholder="XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12">
+        <button class="btn primary" type="submit">Accéder au suivi</button>
+        <div class="err" id="loginErr"></div>
+        <div class="foot"><a href="atc.html">Vous êtes ATC ? Votre espace est ici</a></div>
+    </form>
+</div>
+
+<div id="app" class="hidden">
+    <div class="topbar"><div class="in">
+        <img class="logo" src="img/logo-picard.png" alt="Picard">
+        <div class="titre">Suivi de l’opération <small id="qui"></small></div>
+        <div class="sp"></div>
+        <div class="countdown" id="cd"></div>
+        <button class="btn sm" id="refresh" title="Actualiser">↻</button>
+        <a class="btn sm hide-m" href="index.html" target="_blank">Présentation</a>
+        <button class="btn sm" id="logout">Quitter</button>
+    </div></div>
+    <div class="wrap">
+        <div class="head">
+            <div><h1>Coup de boost pour les ATC</h1><p id="maj"></p></div>
+            <div class="tabs" id="vues">
+                <button class="tab on" data-v="board">Tableau de bord</button>
+                <button class="tab" data-v="detail">Détail des IAP</button>
+                <button class="tab hidden" data-v="codes" id="tabCodes">Codes & listing</button>
+            </div>
+        </div>
+
+        <section id="vBoard">
+            <div class="kpis" id="kpis"></div>
+            <div class="row2">
+                <div class="card"><div class="hd"><h3>Entonnoir</h3></div><div class="bd"><div class="funnel" id="funnel"></div></div></div>
+                <div class="card"><div class="hd"><h3>Ventes par référence</h3></div><div class="bd tbl"><table id="refs"></table></div></div>
+            </div>
+            <div class="card" style="margin-top:16px"><div class="hd"><h3>Classement des ATC</h3><span class="muted" style="font-size:13px">Cliquez sur un ATC pour voir ses IAP</span></div><div class="bd tbl"><table id="atcs"></table></div></div>
+            <div class="card" style="margin-top:16px"><div class="hd"><h3>Activité récente</h3></div><div class="bd"><div class="journal" id="journal"></div></div></div>
+        </section>
+
+        <section id="vDetail" class="hidden">
+            <div class="card">
+                <div class="hd">
+                    <div class="filters">
+                        <select id="fAtc"></select>
+                        <select id="fEtat"><option value="">Toutes les étapes</option><option value="zero">Pas appelés</option><option value="appel">Appelés</option><option value="mail">Mail envoyé</option><option value="presentation">Présentation faite</option><option value="commande">Commandés</option></select>
+                        <input id="fQ" placeholder="Rechercher…">
+                    </div>
+                    <div class="sp"></div>
+                    <button class="btn sm" id="xCmd">⬇ Export commandes (Excel)</button>
+                    <button class="btn sm" id="xAll">⬇ Export suivi complet</button>
+                </div>
+                <div class="bd tbl"><table id="detail"></table></div>
+            </div>
+        </section>
+
+        <section id="vCodes" class="hidden">
+            <div class="card"><div class="hd"><h3>Codes d’accès</h3><div class="sp"></div>
+                <button class="btn sm" id="copyAll">📋 Copier tous les liens ATC</button></div>
+                <div class="bd tbl"><table id="codes"></table>
+                <form id="addCode" class="filters" style="margin-top:14px"><input id="newNom" placeholder="Nom (ex. nouvel ATC)" required><select id="newRole"><option value="atc">ATC</option><option value="adv">ADV</option><option value="direction">Direction</option></select><button class="btn sm dark">Créer un code</button></form></div>
+            </div>
+            <div class="card" style="margin-top:16px"><div class="hd"><h3>Mettre à jour le listing IAP</h3></div><div class="bd">
+                <p class="muted" style="margin:0 0 12px;font-size:13px">Fichier Excel au même format que « Listing IAP 2026 » (colonnes Commercial, N°, Nom, Statut 2026, Nom, Prénom, Mail, Portable, Adresse, CP, Ville). Le suivi déjà saisi est conservé pour les IAP existants. Un code est créé pour chaque nouvel ATC.</p>
+                <label class="drop" id="drop">Déposer le fichier ici ou cliquer pour le choisir<input type="file" id="file" accept=".xlsx,.xls" hidden></label>
+            </div></div>
+        </section>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="config.js"></script>
+<script src="js/offre.js"></script>
+<script src="js/api.js"></script>
+<script src="js/suivi.js"></script>
+</body>
+</html>

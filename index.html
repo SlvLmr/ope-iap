@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coup de boost IAP</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+    html, body { height: 100%; background: var(--ink); overflow: hidden; }
+    .deck { position: fixed; inset: 0; display: grid; place-items: center; }
+    .stage { width: 1600px; height: 900px; position: relative; transform-origin: center; flex: none; }
+    .slide { position: absolute; inset: 0; border-radius: 0; overflow: hidden; color: #fff; padding: 84px 96px; display: flex; flex-direction: column;
+        background: radial-gradient(1100px 700px at 100% 0%, rgba(255, 95, 31, .18), transparent 60%), radial-gradient(900px 600px at 0% 100%, rgba(59, 108, 246, .14), transparent 60%), var(--ink);
+        opacity: 0; visibility: hidden; transition: opacity .45s ease, transform .45s ease; transform: translateX(40px); }
+    .slide.on { opacity: 1; visibility: visible; transform: none; }
+    .slide.prev { transform: translateX(-40px); }
+    .slide.light { background: #f6f7fb; color: var(--text); }
+    .eyebrow { font-size: 18px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--accent-2); margin-bottom: 18px; display: flex; align-items: center; gap: 12px; }
+    .eyebrow::before { content: ''; width: 36px; height: 3px; border-radius: 3px; background: var(--grad); }
+    .light .eyebrow { color: var(--accent); }
+    h1, h2 { margin: 0; letter-spacing: -.035em; line-height: 1.02; }
+    h2 { font-size: 68px; font-weight: 800; max-width: 1200px; }
+    .lead { font-size: 26px; color: rgba(255, 255, 255, .7); max-width: 1100px; margin-top: 22px; line-height: 1.45; }
+    .light .lead { color: var(--text-2); }
+    .logo-slide { position: absolute; top: 40px; right: 56px; height: 24px; opacity: .9; }
+    .light .logo-slide { filter: invert(1); opacity: .75; }
+    .foot-slide { position: absolute; left: 96px; right: 96px; bottom: 34px; display: flex; justify-content: space-between; font-size: 15px; color: rgba(255, 255, 255, .4); }
+    .light .foot-slide { color: var(--muted); }
+    .grow { flex: 1; }
+
+    /* Couverture */
+    .cover h1 { font-size: 136px; font-weight: 800; line-height: .92; }
+    .cover .dates { display: inline-flex; gap: 14px; align-items: center; margin-top: 40px; font-size: 28px; font-weight: 700; background: rgba(255, 255, 255, .06); border: 1px solid var(--ink-line); padding: 16px 26px; border-radius: 999px; }
+    .cover .dates i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 20px var(--accent); }
+    .cover .photos { position: absolute; right: -170px; top: 150px; display: grid; grid-template-columns: 250px 250px; gap: 18px; transform: rotate(-6deg); }
+    .cover .photos img { width: 250px; height: 320px; object-fit: cover; border-radius: 26px; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .7); }
+    .cover .photos img:nth-child(2n) { margin-top: 60px; }
+
+    /* Grilles de cartes */
+    .tiles { display: grid; gap: 22px; margin-top: 56px; }
+    .tile { background: rgba(255, 255, 255, .05); border: 1px solid var(--ink-line); border-radius: 28px; padding: 32px; }
+    .light .tile { background: #fff; border-color: var(--line); box-shadow: var(--shadow); }
+    .tile .ico { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; font-size: 28px; background: rgba(255, 95, 31, .14); margin-bottom: 22px; }
+    .light .tile .ico { background: var(--accent-soft); }
+    .tile h3 { margin: 0 0 10px; font-size: 28px; letter-spacing: -.02em; }
+    .tile p { margin: 0; font-size: 20px; color: rgba(255, 255, 255, .65); line-height: 1.45; }
+    .light .tile p { color: var(--text-2); }
+    .big { font-size: 76px; font-weight: 800; letter-spacing: -.04em; line-height: 1; margin-bottom: 14px; }
+
+    /* Tableau des prix */
+    .prix { margin-top: 30px; display: grid; gap: 10px; }
+    .prix .row { display: grid; grid-template-columns: 90px 1fr 190px 190px 260px; align-items: center; gap: 24px; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 9px 26px 9px 10px; box-shadow: var(--shadow); }
+    .prix .row img { width: 90px; height: 56px; object-fit: cover; border-radius: 12px; }
+    .prix .n { font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
+    .prix .n small { display: block; font-size: 16px; font-weight: 600; color: var(--muted); margin-top: 2px; }
+    .prix .base { font-size: 22px; color: var(--muted); text-decoration: line-through; text-align: right; }
+    .prix .promo { font-size: 30px; font-weight: 800; text-align: right; color: var(--text); }
+    .prix .rem { display: flex; align-items: center; gap: 12px; }
+    .prix .rem .track { flex: 1; height: 10px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+    .prix .rem .track i { display: block; height: 100%; background: var(--grad); border-radius: 99px; }
+    .prix .rem b { font-size: 24px; color: var(--accent); width: 96px; text-align: right; }
+    .prix .head { display: grid; grid-template-columns: 90px 1fr 190px 190px 260px; gap: 24px; padding: 0 26px 0 14px; font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .prix .head span:nth-child(3), .prix .head span:nth-child(4) { text-align: right; }
+
+    /* Produits */
+    .produit { display: grid; grid-template-columns: 560px 1fr; gap: 72px; flex: 1; align-items: center; }
+    .produit .visuel { position: relative; height: 640px; border-radius: 36px; overflow: hidden; box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .8); }
+    .produit .visuel img { width: 100%; height: 100%; object-fit: cover; }
+    .produit .visuel .badge { position: absolute; left: 24px; top: 24px; background: rgba(10, 13, 24, .8); backdrop-filter: blur(8px); border-radius: 999px; padding: 10px 18px; font-weight: 800; font-size: 20px; }
+    .produit .visuel .badge b { color: #ffd27a; }
+    .produit h2 { font-size: 84px; }
+    .produit .acc { font-size: 28px; color: var(--accent-2); font-weight: 700; margin-top: 10px; }
+    .produit ul { list-style: none; padding: 0; margin: 34px 0 0; display: grid; gap: 14px; }
+    .produit li { font-size: 21px; color: rgba(255, 255, 255, .8); padding-left: 38px; position: relative; line-height: 1.4; }
+    .produit li::before { content: ''; position: absolute; left: 0; top: 6px; width: 20px; height: 20px; border-radius: 6px; background: var(--grad); -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M7.6 13.2 4.4 10l-1.4 1.4 4.6 4.6L17 6.6l-1.4-1.4z" fill="black"/></svg>') center/contain no-repeat; mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M7.6 13.2 4.4 10l-1.4 1.4 4.6 4.6L17 6.6l-1.4-1.4z" fill="black"/></svg>') center/contain no-repeat; }
+    .prix-pills { display: flex; gap: 14px; margin-top: 36px; flex-wrap: wrap; }
+    .pill { background: rgba(255, 255, 255, .06); border: 1px solid var(--ink-line); border-radius: 20px; padding: 14px 20px; }
+    .pill .c { font-size: 15px; color: rgba(255, 255, 255, .55); font-weight: 600; }
+    .pill .p { font-size: 30px; font-weight: 800; margin-top: 2px; }
+    .pill .p s { font-size: 18px; color: rgba(255, 255, 255, .4); font-weight: 500; margin-left: 8px; }
+    .pill .p em { font-style: normal; font-size: 18px; color: var(--accent-2); margin-left: 8px; }
+    .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; flex: 1; }
+    .duo .p2 { display: grid; grid-template-columns: 260px 1fr; gap: 30px; align-items: start; }
+    .duo .p2 img { width: 260px; height: 340px; object-fit: cover; border-radius: 26px; }
+    .duo h3 { font-size: 40px; margin: 0; letter-spacing: -.02em; }
+    .duo .acc { font-size: 20px; margin-top: 6px; }
+    .duo ul { margin-top: 20px; gap: 10px; }
+    .duo li { font-size: 18px; }
+    .duo .prix-pills { margin-top: 22px; gap: 10px; }
+    .duo .pill { padding: 10px 16px; }
+    .duo .pill .p { font-size: 24px; }
+
+    /* Process */
+    .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; margin-top: 60px; position: relative; }
+    .steps::before { content: ''; position: absolute; top: 44px; left: 8%; right: 8%; height: 3px; background: linear-gradient(90deg, rgba(255, 95, 31, .1), var(--accent), rgba(255, 193, 90, .4)); }
+    .step { position: relative; text-align: center; }
+    .step .rond { width: 88px; height: 88px; margin: 0 auto 26px; border-radius: 50%; display: grid; place-items: center; font-size: 36px; background: var(--ink-2); border: 2px solid rgba(255, 95, 31, .6); box-shadow: 0 0 0 8px var(--ink); }
+    .step h3 { margin: 0 0 10px; font-size: 28px; }
+    .step p { margin: 0; font-size: 18px; color: rgba(255, 255, 255, .62); line-height: 1.45; padding: 0 6px; }
+
+    /* Mockup espace ATC */
+    .mock { background: #fff; color: var(--text); border-radius: 28px; overflow: hidden; box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .8); font-size: 16px; }
+    .mock .mt { background: var(--ink-2); color: #fff; padding: 16px 22px; display: flex; gap: 10px; align-items: center; font-weight: 700; }
+    .mock .mt span { margin-left: auto; font-size: 13px; color: rgba(255, 255, 255, .6); font-weight: 500; }
+    .mock .ml { padding: 14px 22px; display: grid; grid-template-columns: 1fr repeat(4, 64px); gap: 10px; align-items: center; border-bottom: 1px solid var(--line); }
+    .mock .ml b { display: block; font-size: 16px; } .mock .ml small { color: var(--muted); font-size: 13px; }
+    .mock .ck { width: 34px; height: 34px; border-radius: 10px; border: 2px solid var(--line-2); margin: 0 auto; display: grid; place-items: center; font-size: 16px; }
+    .mock .ck.on { background: var(--grad); border-color: transparent; color: #fff; }
+    .mock .mh { padding: 10px 22px; display: grid; grid-template-columns: 1fr repeat(4, 64px); gap: 10px; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; text-align: center; background: var(--surface-2); }
+    .mock .mh span:first-child { text-align: left; }
+
+    /* Calendrier */
+    .timeline { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; margin-top: 60px; }
+    .tl { border-radius: 26px; padding: 28px; background: rgba(255, 255, 255, .05); border: 1px solid var(--ink-line); }
+    .tl.hot { background: var(--grad); border-color: transparent; }
+    .tl .d { font-size: 18px; font-weight: 700; color: rgba(255, 255, 255, .6); text-transform: uppercase; letter-spacing: .08em; }
+    .tl.hot .d { color: rgba(255, 255, 255, .85); }
+    .tl .j { font-size: 54px; font-weight: 800; letter-spacing: -.03em; margin: 8px 0 12px; }
+    .tl p { margin: 0; font-size: 19px; line-height: 1.4; color: rgba(255, 255, 255, .8); }
+    .tl.hot p { color: #fff; }
+
+    .final { justify-content: center; align-items: flex-start; }
+    .final h2 { font-size: 120px; }
+
+    /* Navigation */
+    .nav { position: fixed; z-index: 10; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; background: rgba(18, 23, 41, .75); backdrop-filter: blur(10px);
+        border: 1px solid var(--ink-line); border-radius: 999px; padding: 6px; color: #fff; opacity: .35; transition: opacity .2s; }
+    .nav:hover, body.touch .nav { opacity: 1; }
+    .nav button { width: 38px; height: 38px; border-radius: 50%; border: 0; background: transparent; color: #fff; cursor: pointer; font-size: 17px; display: grid; place-items: center; }
+    .nav button:hover { background: rgba(255, 255, 255, .1); }
+    .nav .cpt { font-size: 13px; font-weight: 700; min-width: 56px; text-align: center; font-variant-numeric: tabular-nums; }
+    .nav a { color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; padding: 0 14px; height: 38px; display: grid; place-items: center; border-radius: 999px; background: var(--grad); }
+    .progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--grad); z-index: 10; transition: width .4s; }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck"><div class="stage" id="stage">
+
+<!-- 1. Couverture -->
+<section class="slide cover">
+    <img class="logo-slide" src="img/logo-picard.png" alt="Picard Serrures">
+    <div class="eyebrow">Opération flash · Réseau IAP</div>
+    <h1>Coup de boost<br><span class="grad-text">pour les ATC</span></h1>
+    <p class="lead" style="max-width:760px">Serrures de haute sécurité à prix préférentiels pour nos Installateurs Agréés Picard.</p>
+    <div><span class="dates"><i></i>Du 23 au 27 novembre 2026 · jusqu’à 18h</span></div>
+    <div class="photos">
+        <img src="img/presence3.webp" alt=""><img src="img/serenis710.webp" alt="">
+        <img src="img/presence2.webp" alt=""><img src="img/presence2-etroite.webp" alt="">
+    </div>
+    <div class="foot-slide"><span>Visio de lancement ATC + ADV · 20 novembre 2026</span><span>Picard Serrures</span></div>
+</section>
+
+<!-- 2. Pourquoi maintenant -->
+<section class="slide">
+    <img class="logo-slide" src="img/logo-picard.png" alt="">
+    <div class="eyebrow">Pourquoi maintenant</div>
+    <h2>Les jours raccourcissent,<br>les cambriolages <span class="grad-text">augmentent</span>.</h2>
+    <p class="lead">C’est la période de l’année où les cambriolages sont les plus fréquents. La sécurité des domiciles et des locaux professionnels devient une priorité absolue pour les clients de nos IAP.</p>
+    <div class="tiles" style="grid-template-columns:repeat(3,1fr)">
+        <div class="tile"><div class="ico">🌙</div><h3>Saison à risque</h3><p>Nuits plus longues, logements inoccupés en journée : la demande de sécurisation s’envole en fin d’année.</p></div>
+        <div class="tile"><div class="ico">🏠</div><h3>Particuliers & pros</h3><p>Domiciles comme commerces et bureaux : les clients finaux cherchent une protection certifiée A2P.</p></div>
+        <div class="tile"><div class="ico">🚀</div><h3>Le bon moment</h3><p>Dynamiser l’activité des IAP, relancer leurs devis en cours et booster notre chiffre d’affaires avant la clôture.</p></div>
+    </div>
+</section>
+
+<!-- 3. L'opération -->
+<section class="slide">
+    <img class="logo-slide" src="img/logo-picard.png" alt="">
+    <div class="eyebrow">L’opération en bref</div>
+    <h2>5 jours pour faire<br>la différence.</h2>
+    <div class="tiles" style="grid-template-columns:repeat(4,1fr);margin-top:70px">
+        <div class="tile"><div class="big grad-text">5 j</div><h3>Flash</h3><p>Du lundi 23 au vendredi 27 novembre, jusqu’à 18h.</p></div>
+        <div class="tile"><div class="big grad-text">152</div><h3>IAP ciblés</h3><p>Avantage exclusif réseau : Elite, Premium et Officiel.</p></div>
+        <div class="tile"><div class="big grad-text" id="remiseMax">-60 %</div><h3>De remise</h3><p>Sur 6 références Présence 2, Présence 3 et Sérénis 710.</p></div>
+        <div class="tile"><div class="big grad-text">31/12</div><h3>Livré en 2026</h3><p>Toutes les commandes de l’opération livrées avant la fin de l’année.</p></div>
+    </div>
+    <div class="foot-slide"><span>⏳ Temps et stocks limités : nos équipes de production sont déjà sur le pont.</span><span></span></div>
+</section>
+
+<!-- 4. Les prix -->
+<section class="slide light">
+    <img class="logo-slide" src="img/logo-picard.png" alt="">
+    <div class="eyebrow">Nos serrures à prix préférentiels</div>
+    <h2 style="font-size:58px">6 références, des prix jamais vus.</h2>
+    <div class="prix" id="prix"></div>
+    <div class="foot-slide"><span>Prix HT · mêmes prix promo qu’en juin 2026, avec Présence 3 et Sérénis 710 en plus</span><span></span></div>
+</section>
+
+<!-- 5. Présence 2 -->
+<section class="slide" data-produits="presence2,presence2e">
+    <img class="logo-slide" src="img/logo-picard.png" alt="">
+    <div class="eyebrow">La gamme en promo · 1/3</div>
+    <h2 style="font-size:60px">Présence 2 <span class="grad-text">& Présence 2 Étroite</span></h2>
+    <div class="duo" id="duoP2"></div>
+</section>
+
+<!-- 6. Présence 3 -->
+<section class="slide" data-produit="presence3"><img class="logo-slide" src="img/logo-picard.png" alt=""></section>
+
+<!-- 7. Sérénis 710 -->
+<section class="slide" data-produit="serenis710"><img class="logo-slide" src="img/logo-picard.png" alt=""></section>
+
+<!-- 8. Arguments IAP -->
+<section class="slide light">
+    <img class="logo-slide" src="img/logo-picard.png" alt="">
+    <div class="eyebrow">Argumentaire</div>
+    <h2 style="font-size:58px">Ce que l’IAP y gagne.</h2>
+    <div class="tiles" style="grid-template-columns:repeat(3,1fr);margin-top:40px">
+        <div class="tile"><div class="ico">⭐</div><h3>Son statut paie</h3><p>Remises exceptionnelles réservées aux membres du réseau : l’IAP profite de son statut pour se démarquer de la concurrence.</p></div>
+        <div class="tile"><div class="ico">📂</div><h3>Ses devis repartent</h3><p>Le moment idéal pour relancer les devis en cours et transformer les hésitants avant l’hiver.</p></div>
+        <div class="tile"><div class="ico">📣</div><h3>Une offre à communiquer</h3><p>Des prix attractifs à relayer auprès de ses clients finaux, appuyés par notre post réseaux sociaux sur la sécurité.</p></div>
+    </div>
+    <div class="tiles" style="grid-template-columns:1fr 1fr;margin-top:22px">
+        <div class="tile"><h3>« Je verrai en janvier. »</h3><p>L’opération s’arrête le 27 à 18h, stocks limités. En janvier, ce sera le prix tarif : jusqu’à <b id="ecoMax"></b> de plus par serrure.</p></div>
+        <div class="tile"><h3>« Je n’ai pas de chantier en cours. »</h3><p>Livré avant fin 2026 : du stock certifié A2P prêt à poser, au meilleur prix, pour les demandes urgentes de l’hiver.</p></div>
+    </div>
+</section>
+
+<!-- 9. Process -->
+<section class="slide">
+    <img class="logo-slide" src="img/logo-picard.png" alt="">
+    <div class="eyebrow">Ta méthode phoning</div>
+    <h2>Un process simple,<br>suivi au jour le jour.</h2>
+    <div class="steps">
+        <div class="step"><div class="rond">📅</div><h3>Date</h3><p>On planifie : priorité Elite, puis Premium, puis Officiel.</p></div>
+        <div class="step"><div class="rond">📞</div><h3>Appel</h3><p>On présente l’opération et on capte le besoin de l’IAP.</p></div>
+        <div class="step"><div class="rond">✉️</div><h3>Mail</h3><p>« Proposition et tarification suite à notre échange téléphonique », prêt en un clic.</p></div>
+        <div class="step"><div class="rond">📋</div><h3>Présentation</h3><p>Fiches produits et arguments, bon de commande prérempli.</p></div>
+        <div class="step"><div class="rond">✅</div><h3>Commande</h3><p>Quantités saisies, montant calculé, transmis à l’ADV.</p></div>
+    </div>
+    <div class="foot-slide"><span>Chaque étape cochée est datée automatiquement : le suivi se fait tout seul.</span><span></span></div>
+</section>
+
+<!-- 10. Espace ATC -->
+<section class="slide">
+    <img class="logo-slide" src="img/logo-picard.png" alt="">
+    <div style="display:grid;grid-template-columns:1fr 720px;gap:70px;align-items:center;flex:1">
+        <div>
+            <div class="eyebrow">Ton espace ATC</div>
+            <h2 style="font-size:64px">Ta to-do phoning,<br>avec ton code perso.</h2>
+            <p class="lead" style="font-size:23px">Un lien unique, un code personnel : tu retrouves uniquement tes IAP, avec leurs coordonnées, et tu coches chaque étape au fil de l’eau, depuis ton ordinateur ou ton téléphone.</p>
+            <div class="prix-pills">
+                <div class="pill"><div class="c">Lien</div><div class="p" style="font-size:22px" id="lienAtc">…/atc.html</div></div>
+                <div class="pill"><div class="c">Code</div><div class="p" style="font-size:22px">envoyé à chaque ATC</div></div>
+            </div>
+        </div>
+        <div class="mock">
+            <div class="mt">Mes IAP <span>Ex. 4 IAP sur 19 appelés</span></div>
+            <div class="mh"><span>IAP</span><span>Appel</span><span>Mail</span><span>Prés.</span><span>Cde</span></div>
+            <div class="ml"><div><b>Serrurerie Exemple</b><small>ELITE · Lyon</small></div><i class="ck on">✓</i><i class="ck on">✓</i><i class="ck on">✓</i><i class="ck on">✓</i></div>
+            <div class="ml"><div><b>Sécurité Démo</b><small>PREMIUM · Reims</small></div><i class="ck on">✓</i><i class="ck on">✓</i><i class="ck on">✓</i><i class="ck"></i></div>
+            <div class="ml"><div><b>Fermetures Test</b><small>PREMIUM · Rouen</small></div><i class="ck on">✓</i><i class="ck on">✓</i><i class="ck"></i><i class="ck"></i></div>
+            <div class="ml"><div><b>Accès Modèle</b><small>OFFICIEL · Nantes</small></div><i class="ck on">✓</i><i class="ck"></i><i class="ck"></i><i class="ck"></i></div>
+            <div class="ml" style="border:0"><div><b>Protection Type</b><small>OFFICIEL · Lille</small></div><i class="ck"></i><i class="ck"></i><i class="ck"></i><i class="ck"></i></div>
+        </div>
+    </div>
+</section>
+
+<!-- 11. Le kit -->
+<section class="slide light">
+    <img class="logo-slide" src="img/logo-picard.png" alt="">
+    <div class="eyebrow">Le kit de l’opération</div>
+    <h2 style="font-size:58px">Tout est prêt pour toi.</h2>
+    <div class="tiles" style="grid-template-columns:repeat(4,1fr);margin-top:56px">
+        <div class="tile"><div class="ico">✉️</div><h3>Mail type</h3><p>Proposition et tarification personnalisées au nom de l’IAP, à ouvrir dans Outlook ou à copier.</p></div>
+        <div class="tile"><div class="ico">🧾</div><h3>Bon de commande</h3><p>Prérempli avec les coordonnées de l’IAP et les 6 références, total calculé.</p></div>
+        <div class="tile"><div class="ico">🔒</div><h3>Fiches produits</h3><p>Arguments clés de Présence 2, Présence 3 et Sérénis 710, issus de notre site.</p></div>
+        <div class="tile"><div class="ico">📱</div><h3>Post réseaux sociaux</h3><p>Sur les pages de nos IAP : la sécurité et les cambriolages, sans parler de promo.</p></div>
+    </div>
+</section>
+
+<!-- 12. Calendrier -->
+<section class="slide">
+    <img class="logo-slide" src="img/logo-picard.png" alt="">
+    <div class="eyebrow">Calendrier</div>
+    <h2>Les dates à retenir.</h2>
+    <div class="timeline">
+        <div class="tl"><div class="d">Jeudi</div><div class="j">20 nov.</div><p>Visio de lancement ATC + ADV (30 min).</p></div>
+        <div class="tl"><div class="d">Vendredi</div><div class="j">21 nov.</div><p>Réception des codes, préparation de la liste d’appels.</p></div>
+        <div class="tl hot"><div class="d">Lundi</div><div class="j">23 nov.</div><p>Lancement : phoning, mails, premières commandes.</p></div>
+        <div class="tl hot"><div class="d">Vendredi 18h</div><div class="j">27 nov.</div><p>Clôture de l’opération. Dernières commandes saisies.</p></div>
+        <div class="tl"><div class="d">Avant le</div><div class="j">31 déc.</div><p>Livraison de toutes les commandes de l’opération.</p></div>
+    </div>
+</section>
+
+<!-- 13. Final -->
+<section class="slide final">
+    <img class="logo-slide" src="img/logo-picard.png" alt="">
+    <div class="eyebrow">Avec Gilbert, on compte sur vous</div>
+    <h2>À vos carnets<br>de commandes,<br><span class="grad-text">et bon boost à tous !</span></h2>
+    <div class="foot-slide"><span>Opération « Coup de boost pour les ATC » · 23 → 27 novembre 2026</span><span>Picard Serrures</span></div>
+</section>
+
+</div></div>
+
+<nav class="nav">
+    <button id="bPrev" title="Précédent (←)">←</button>
+    <span class="cpt" id="cpt">1 / 13</span>
+    <button id="bNext" title="Suivant (→)">→</button>
+    <button id="bFull" title="Plein écran (F)">⛶</button>
+    <a href="atc.html">Espace ATC</a>
+</nav>
+
+<script src="js/offre.js"></script>
+<script>
+// ─── Contenu généré à partir des données de l'offre ───
+const fr = n => String(n).replace('.', ',');
+document.getElementById('remiseMax').textContent = `-${Math.floor(Math.max(...REFS.map(remise)))} %`;
+document.getElementById('ecoMax').textContent = euro(Math.max(...REFS.map(economie)), 0) + ' HT';
+document.getElementById('lienAtc').textContent = location.host ? location.host + location.pathname.replace(/[^/]*$/, '') + 'atc.html' : 'atc.html';
+const maxR = Math.max(...REFS.map(remise));
+document.getElementById('prix').innerHTML = `<div class="head"><span></span><span>Serrure · cylindre</span><span>Prix tarif HT</span><span>Prix opé HT</span><span>Remise</span></div>` +
+    REFS.map(r => `<div class="row"><img src="${PRODUITS[r.produit].img}" alt=""><div class="n">${esc(r.nom)}<small>${esc(r.cyl)} · A2P${'★'.repeat(PRODUITS[r.produit].a2p)}</small></div>
+    <div class="base num">${euro(r.base)}</div><div class="promo num">${euro(r.promo)}</div>
+    <div class="rem"><div class="track"><i style="width:${remise(r) / maxR * 100}%"></i></div><b class="num">-${fr(remise(r))} %</b></div></div>`).join('');
+
+const pills = id => REFS.filter(r => r.produit === id).map(r => `<div class="pill"><div class="c">${esc(r.cyl)}</div><div class="p num">${euro(r.promo)}<s>${euro(r.base)}</s><em>-${fr(remise(r))} %</em></div></div>`).join('');
+const liste = (p, n) => `<ul>${p.args.slice(0, n).map(a => `<li>${esc(a)}</li>`).join('')}</ul>`;
+document.getElementById('duoP2').innerHTML = ['presence2', 'presence2e'].map(id => { const p = PRODUITS[id]; return `
+    <div class="p2 produit" style="display:grid"><img src="${p.img}" alt="">
+    <div><h3>${esc(p.nom)}</h3><div class="acc">${esc(p.accroche)} · A2P${'★'.repeat(p.a2p)}</div>${liste(p, 4)}<div class="prix-pills">${pills(id)}</div></div></div>`; }).join('');
+document.querySelectorAll('.slide[data-produit]').forEach((s, i) => {
+    const id = s.dataset.produit, p = PRODUITS[id];
+    s.insertAdjacentHTML('beforeend', `<div class="eyebrow">La gamme en promo · ${i + 2}/3</div>
+    <div class="produit"><div class="visuel"><img src="${p.img}" alt=""><span class="badge">A2P <b>${'★'.repeat(p.a2p)}</b> · ${esc(p.points)}</span></div>
+    <div><h2>${esc(p.nom)}</h2><div class="acc">${esc(p.accroche)}</div>${liste(p, 6)}<div class="prix-pills">${pills(id)}</div></div></div>`);
+});
+
+// ─── Navigation ───
+const slides = [...document.querySelectorAll('.slide')], stage = document.getElementById('stage');
+let cur = Math.min(slides.length - 1, Math.max(0, (parseInt(location.hash.slice(1)) || 1) - 1));
+function show(i) {
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, k) => { s.classList.toggle('on', k === cur); s.classList.toggle('prev', k < cur); });
+    document.getElementById('cpt').textContent = `${cur + 1} / ${slides.length}`;
+    document.getElementById('progress').style.width = `${(cur + 1) / slides.length * 100}%`;
+    history.replaceState(null, '', '#' + (cur + 1));
+}
+function fit() { const k = Math.min(innerWidth / 1600, innerHeight / 900); stage.style.transform = `scale(${k})`; }
+addEventListener('resize', fit); fit(); show(cur);
+addEventListener('keydown', e => {
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(cur + 1); }
+    else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(cur - 1); }
+    else if (e.key === 'Home') show(0); else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key.toLowerCase() === 'f') plein();
+});
+const plein = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.();
+document.getElementById('bPrev').onclick = () => show(cur - 1);
+document.getElementById('bNext').onclick = () => show(cur + 1);
+document.getElementById('bFull').onclick = plein;
+let x0 = null;
+addEventListener('touchstart', e => { x0 = e.touches[0].clientX; document.body.classList.add('touch'); }, { passive: true });
+addEventListener('touchend', e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1)); x0 = null; });
+document.querySelector('.deck').addEventListener('click', e => { if (!e.target.closest('a,button')) show(cur + (e.clientX > innerWidth / 3 ? 1 : -1)); });
+</script>
+</body>
+</html>

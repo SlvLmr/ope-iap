@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mon opération IAP</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+    .hello { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 6px 0 20px; }
+    .hello h1 { margin: 0; font-size: 30px; letter-spacing: -.03em; }
+    .hello p { margin: 4px 0 0; color: var(--text-2); }
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tab { height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+    .tab b { font-size: 12px; background: var(--surface-2); border-radius: 999px; padding: 1px 8px; color: var(--text-2); }
+    .tab.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .tab.on b { background: rgba(255, 255, 255, .15); color: #fff; }
+    .tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 22px 0 14px; }
+    .tools .input { max-width: 280px; height: 38px; border-radius: 999px; }
+    .tools .sp { flex: 1; }
+
+    .list { display: grid; gap: 10px; }
+    .iap { display: grid; grid-template-columns: minmax(0, 1.5fr) 150px auto 120px 40px; gap: 18px; align-items: center; padding: 14px 16px 14px 18px; }
+    .iap.done { border-color: rgba(18, 183, 106, .35); background: linear-gradient(90deg, rgba(18, 183, 106, .06), transparent 40%), var(--surface); }
+    .iap .who { min-width: 0; }
+    .iap .who .r { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .iap .who .c { font-size: 13px; color: var(--text-2); margin-top: 3px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .iap .who .c a { text-decoration: none; color: var(--text-2); display: inline-flex; gap: 4px; align-items: center; }
+    .iap .who .c a:hover { color: var(--accent); }
+    .iap .when label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
+    .iap .when input { height: 34px; border-radius: 10px; font-size: 13px; padding: 0 8px; }
+    .steps { display: flex; gap: 6px; }
+    .stp { width: 76px; padding: 6px 0 5px; border-radius: 12px; border: 1.5px solid var(--line-2); background: var(--surface); cursor: pointer; display: grid; justify-items: center; gap: 1px; transition: .15s; }
+    .stp .i { font-size: 16px; filter: grayscale(1); opacity: .55; }
+    .stp .n { font-size: 11px; font-weight: 700; color: var(--muted); }
+    .stp .d { font-size: 10px; color: var(--muted); height: 12px; }
+    .stp:hover { border-color: var(--accent); }
+    .stp.on { background: var(--accent-soft); border-color: var(--accent); }
+    .stp.on .i { filter: none; opacity: 1; }
+    .stp.on .n { color: var(--accent-ink); }
+    .stp.on .d { color: var(--accent-ink); }
+    .stp.cmd.on { background: var(--ok-soft); border-color: var(--ok); }
+    .stp.cmd.on .n, .stp.cmd.on .d { color: var(--ok-ink); }
+    .iap .mt { text-align: right; }
+    .iap .mt .v { font-weight: 800; font-size: 16px; }
+    .iap .mt .s { font-size: 12px; color: var(--muted); }
+    .iap .more { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--surface); cursor: pointer; font-size: 18px; }
+    .iap .more:hover { border-color: var(--accent); color: var(--accent); }
+    .rappel { color: var(--late); font-weight: 700; }
+    .empty { padding: 48px; text-align: center; color: var(--muted); }
+
+    /* Fiche IAP */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .bloc { border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+    .bloc h4 { margin: 0 0 12px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    .coord { display: grid; gap: 6px; font-size: 14px; }
+    .coord a { color: var(--text); font-weight: 600; }
+    .qte { display: grid; gap: 8px; }
+    .qte .l { display: grid; grid-template-columns: 1fr 90px 76px 100px; gap: 10px; align-items: center; font-size: 14px; }
+    .qte .l small { color: var(--muted); display: block; font-size: 12px; }
+    .qte input { height: 36px; text-align: center; padding: 0 6px; }
+    .qte .tot { border-top: 1px dashed var(--line-2); padding-top: 10px; margin-top: 4px; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .stepsBig { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .stepsBig .stp { width: auto; padding: 10px 0; }
+
+    /* Argumentaire */
+    .fiches { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+    .fiche { overflow: hidden; }
+    .fiche img { width: 100%; height: 170px; object-fit: cover; }
+    .fiche .b { padding: 16px; }
+    .fiche h3 { margin: 0; font-size: 18px; }
+    .fiche .a { color: var(--accent); font-weight: 700; font-size: 13px; margin: 2px 0 10px; }
+    .fiche ul { margin: 0; padding-left: 18px; font-size: 13px; color: var(--text-2); display: grid; gap: 4px; }
+    .fiche .px { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .fiche .px span { font-size: 12px; background: var(--accent-soft); color: var(--accent-ink); border-radius: 999px; padding: 4px 10px; font-weight: 700; }
+
+    @media (max-width: 980px) {
+        .iap { grid-template-columns: 1fr auto; grid-template-areas: 'who more' 'steps steps' 'when mt'; gap: 12px; }
+        .iap .who { grid-area: who; } .iap .steps { grid-area: steps; } .iap .when { grid-area: when; } .iap .mt { grid-area: mt; align-self: end; } .iap .more { grid-area: more; }
+        .steps .stp { flex: 1; width: auto; }
+        .grid2 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) { .qte .l { grid-template-columns: 1fr 70px 70px; } .qte .l .pu { display: none; } .stepsBig { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- Connexion -->
+<div class="login" id="login">
+    <form class="box" id="loginForm">
+        <img class="logo" src="img/logo-picard.png" alt="Picard Serrures">
+        <h1>Coup de boost<br><span class="grad-text">pour les ATC</span></h1>
+        <p>Saisis ton code personnel pour accéder à tes IAP et à ta to-do phoning.</p>
+        <input class="input" id="code" placeholder="XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12">
+        <button class="btn primary" type="submit">Accéder à mon espace</button>
+        <div class="err" id="loginErr"></div>
+        <div class="foot"><a href="index.html">Voir la présentation de l’opération</a></div>
+    </form>
+</div>
+
+<!-- Application -->
+<div id="app" class="hidden">
+    <div class="topbar"><div class="in">
+        <img class="logo" src="img/logo-picard.png" alt="Picard">
+        <div class="titre">Coup de boost <small id="qui"></small></div>
+        <div class="sp"></div>
+        <div class="countdown" id="cd"></div>
+        <a class="btn sm hide-m" href="index.html" target="_blank">Présentation</a>
+        <button class="btn sm" id="logout">Quitter</button>
+    </div></div>
+
+    <div class="wrap">
+        <div class="hello">
+            <div><h1 id="bonjour">Bonjour</h1><p id="sous"></p></div>
+            <div class="tabs" id="vues">
+                <button class="tab on" data-v="todo">To-do phoning</button>
+                <button class="tab" data-v="args">Argumentaire & prix</button>
+            </div>
+        </div>
+
+        <section id="vTodo">
+            <div class="kpis" id="kpis"></div>
+            <div class="tools">
+                <div class="tabs" id="filtres"></div>
+                <div class="sp"></div>
+                <input class="input" id="q" placeholder="Rechercher un IAP, une ville…">
+            </div>
+            <div class="list" id="list"></div>
+        </section>
+
+        <section id="vArgs" class="hidden">
+            <div class="fiches" id="fiches"></div>
+            <div class="card" style="margin-top:16px;padding:20px">
+                <h3 style="margin:0 0 12px">Les points forts Picard</h3>
+                <ul id="marque" style="margin:0;padding-left:18px;color:var(--text-2);display:grid;gap:6px"></ul>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="modal hidden" id="modal"><div class="sheet" id="sheet"></div></div>
+
+<script src="config.js"></script>
+<script src="js/offre.js"></script>
+<script src="js/api.js"></script>
+<script src="js/atc.js"></script>
+</body>
+</html>
