@@ -135,6 +135,20 @@
     .nav .cpt { font-size: 13px; font-weight: 700; min-width: 56px; text-align: center; font-variant-numeric: tabular-nums; }
     .nav a { color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; padding: 0 14px; height: 38px; display: grid; place-items: center; border-radius: 999px; background: var(--grad); }
     .progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--grad); z-index: 10; transition: width .4s; }
+
+    /* Export PDF : une slide par page, format 16:9 */
+    @page { size: 1600px 900px; margin: 0; }
+    @media print {
+        html, body { height: auto; overflow: visible; background: var(--ink); }
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        .nav, .progress { display: none !important; }
+        .grad-text { background: none !important; -webkit-text-fill-color: #ff6a26; color: #ff6a26 !important; }
+        .deck { position: static; display: block; }
+        .stage { transform: none !important; width: 1600px; height: auto; }
+        .slide { position: relative; inset: auto; width: 1600px; height: 900px; opacity: 1 !important; visibility: visible !important; transform: none !important; transition: none !important;
+            break-after: page; page-break-after: always; }
+        .slide:last-child { break-after: auto; page-break-after: auto; }
+    }
 </style>
 </head>
 <body>
@@ -302,6 +316,7 @@
     <span class="cpt" id="cpt">1 / 13</span>
     <button id="bNext" title="Suivant (→)">→</button>
     <button id="bFull" title="Plein écran (F)">⛶</button>
+    <button id="bPdf" title="Exporter en PDF (P)" style="width:auto;padding:0 12px;font-size:13px;font-weight:700;border-radius:999px">PDF</button>
     <a href="atc.html">Espace ATC</a>
 </nav>
 
@@ -347,11 +362,15 @@ addEventListener('keydown', e => {
     else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(cur - 1); }
     else if (e.key === 'Home') show(0); else if (e.key === 'End') show(slides.length - 1);
     else if (e.key.toLowerCase() === 'f') plein();
+    else if (e.key.toLowerCase() === 'p' && !e.ctrlKey && !e.metaKey) exporterPdf();
 });
 const plein = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.();
 document.getElementById('bPrev').onclick = () => show(cur - 1);
 document.getElementById('bNext').onclick = () => show(cur + 1);
 document.getElementById('bFull').onclick = plein;
+// Export PDF : la boîte d'impression du navigateur (choisir « Enregistrer au format PDF »)
+const exporterPdf = () => { const t = document.title; document.title = 'Présentation - Coup de boost IAP'; print(); document.title = t; };
+document.getElementById('bPdf').onclick = exporterPdf;
 let x0 = null;
 addEventListener('touchstart', e => { x0 = e.touches[0].clientX; document.body.classList.add('touch'); }, { passive: true });
 addEventListener('touchend', e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1)); x0 = null; });
