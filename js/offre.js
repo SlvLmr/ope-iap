@@ -103,40 +103,44 @@ const montantDe = q => REFS.reduce((t, r) => t + (+q?.[r.id] || 0) * r.promo, 0)
 
 // ─── Mail « Proposition et tarification suite à notre échange téléphonique » ───
 function mailObjet() { return 'Proposition et tarification suite à notre échange téléphonique – Opération flash serrures Picard'; }
+// Texte validé par la direction (19/11/2026). Les prix viennent de REFS ; seule la signature de l'ATC est ajoutée.
+const MAIL_INTRO = [
+    'Les jours raccourcissent, et c\'est la période de l\'année où les cambriolages sont les plus fréquents. Une priorité absolue : la sécurité des domiciles des particuliers et des locaux professionnels.',
+    'C\'est le moment idéal pour dynamiser votre activité et booster votre chiffre d\'affaires.',
+    'Pour vous accompagner, nous lançons l\'opération « Coup de boost », active du 23 novembre au 27 novembre 2026 (jusqu\'à 18h).',
+];
+const MAIL_AVANTAGE = 'En tant que membres de notre réseau, profitez de votre statut pour bénéficier de remises exceptionnelles. C’est l’occasion idéale pour vous de vous démarquer, de relancer vos devis en cours et de communiquer sur des offres attractives auprès de vos clients finaux !';
+const MAIL_DELAI = 'Cette opération flash ne dure que 5 jours. Pour vous garantir une réactivité parfaite face à vos clients, nos équipes de production sont déjà sur le pont : toutes vos commandes saisies durant l\'opération seront livrées avant la fin de l\'année 2026.';
+const MAIL_FIN = 'À vos carnets de commandes, et bon boost à tous !';
+const ligneRef = r => `${r.nom} ${r.cyl} : ${euro(r.promo)} HT au lieu de ${euro(r.base)} HT`;
+
 function mailTexte(iap, atc) {
-    const bonjour = iap?.contact_prenom ? `Bonjour ${iap.contact_prenom},` : 'Bonjour,';
-    const lignes = REFS.map(r => `• ${r.nom} ${r.cyl} : ${euro(r.promo)} HT au lieu de ${euro(r.base)} HT (-${String(remise(r)).replace('.', ',')} %)`).join('\n');
-    return `${bonjour}
+    return `Cher IAP,
 
-Suite à notre échange téléphonique, je vous confirme les conditions exceptionnelles réservées à notre réseau d’Installateurs Agréés Picard, ${OPE.finTexte} :
+${MAIL_INTRO.join('\n\n')}
 
-${lignes}
+✨ Avantage exclusif IAP : ${MAIL_AVANTAGE}
 
-C’est le bon moment pour relancer vos devis en cours et proposer à vos clients une serrure certifiée A2P, montée à la main en France, alors que les cambriolages sont les plus fréquents en cette période de l’année.
+🔒 Nos serrures à prix préférentiels :
 
-${OPE.livraison}
+${REFS.map(r => '• ' + ligneRef(r)).join('\n')}
 
-Vous trouverez ci-joint le bon de commande : il vous suffit de me le retourner complété par retour de mail. Attention, l’opération est limitée dans le temps et dans les stocks.
+⏳ Attention : Temps et stocks limités !
 
-Je reste à votre disposition pour tout complément d’information.
+${MAIL_DELAI}
 
-Bien cordialement,
-${atc || ''}
-Picard Serrures`;
+${MAIL_FIN}${atc ? `\n\n${atc}\nPicard Serrures` : ''}`;
 }
 function mailHtml(iap, atc) {
-    const bonjour = iap?.contact_prenom ? `Bonjour ${esc(iap.contact_prenom)},` : 'Bonjour,';
-    const td = 'padding:6px 10px;border-bottom:1px solid #e5e5e5;font:14px Arial,sans-serif;';
-    const rows = REFS.map(r => `<tr><td style="${td}">${esc(r.nom)} <b>${esc(r.cyl)}</b></td><td style="${td}text-align:right;color:#999;text-decoration:line-through">${euro(r.base)}</td><td style="${td}text-align:right;font-weight:bold;color:#b8862f">${euro(r.promo)}</td><td style="${td}text-align:right">-${String(remise(r)).replace('.', ',')} %</td></tr>`).join('');
-    const p = 'font:14px Arial,sans-serif;color:#222;margin:0 0 12px';
-    return `<div style="${p}">${bonjour}</div>
-<p style="${p}">Suite à notre échange téléphonique, je vous confirme les conditions exceptionnelles réservées à notre réseau d’<b>Installateurs Agréés Picard</b>, <b>${esc(OPE.finTexte)}</b> :</p>
-<table style="border-collapse:collapse;margin:0 0 14px"><tr><th style="${td}text-align:left">Serrure (prix HT)</th><th style="${td}text-align:right">Prix tarif</th><th style="${td}text-align:right">Prix opération</th><th style="${td}text-align:right">Remise</th></tr>${rows}</table>
-<p style="${p}">C’est le bon moment pour relancer vos devis en cours et proposer à vos clients une serrure certifiée A2P, montée à la main en France, alors que les cambriolages sont les plus fréquents en cette période de l’année.</p>
-<p style="${p}"><b>${esc(OPE.livraison)}</b></p>
-<p style="${p}">Vous trouverez ci-joint le bon de commande : il vous suffit de me le retourner complété par retour de mail. Attention, l’opération est limitée dans le temps et dans les stocks.</p>
-<p style="${p}">Je reste à votre disposition pour tout complément d’information.</p>
-<p style="${p}">Bien cordialement,<br>${esc(atc || '')}<br>Picard Serrures</p>`;
+    const p = 'font:14px Arial,sans-serif;color:#222;margin:0 0 12px;line-height:1.45';
+    return `<p style="${p}">Cher IAP,</p>
+${MAIL_INTRO.map(t => `<p style="${p}">${esc(t)}</p>`).join('\n')}
+<p style="${p}">✨ <b>Avantage exclusif IAP :</b> ${esc(MAIL_AVANTAGE)}</p>
+<p style="${p}">🔒 <b>Nos serrures à prix préférentiels :</b></p>
+<ul style="${p}padding-left:22px">${REFS.map(r => `<li style="margin:0 0 4px">${esc(r.nom)} ${esc(r.cyl)} : <b style="color:#b8862f">${euro(r.promo)} HT</b> au lieu de <span style="text-decoration:line-through;color:#888">${euro(r.base)} HT</span></li>`).join('')}</ul>
+<p style="${p}">⏳ <b>Attention : Temps et stocks limités !</b></p>
+<p style="${p}">${esc(MAIL_DELAI)}</p>
+<p style="${p}"><b>${esc(MAIL_FIN)}</b></p>${atc ? `\n<p style="${p}">${esc(atc)}<br>Picard Serrures</p>` : ''}`;
 }
 
 // ─── Copie du mail (mise en forme pour Outlook, avec repli en texte brut) ───
@@ -151,5 +155,5 @@ async function copierMail(iap, atc, texteSeul) {
     await navigator.clipboard.writeText(texte);
     return 'texte';
 }
-// Modèle générique : prénom et signature à compléter
-const MAIL_MODELE_IAP = { contact_prenom: '[Prénom]' };
+// Modèle générique (le mail ne dépend pas de l'IAP)
+const MAIL_MODELE_IAP = {};

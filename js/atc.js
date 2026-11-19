@@ -212,7 +212,7 @@ function rendreFiche(i, garderSaisie) {
                 <button class="btn" id="fCopie">Copier le mail (mise en forme)</button>
                 <button class="btn" id="fBon">🧾 Bon de commande prérempli</button>
             </div>
-            <p class="muted" style="font-size:12px;margin:10px 0 0">Le mail s’ouvre prérempli : pense à joindre le bon de commande. L’étape « Mail » est cochée automatiquement.</p>
+            <p class="muted" style="font-size:12px;margin:10px 0 0">Le mail s’ouvre dans ta messagerie avec l’adresse de l’IAP, et il est aussi copié (en cas de texte coupé, colle-le). Pense à joindre le bon de commande. L’étape « Mail » est cochée automatiquement.</p>
         </div>
         <div class="bloc"><h4>Commande (prix opération HT)</h4>
             <div class="qte">
@@ -243,10 +243,13 @@ function rendreFiche(i, garderSaisie) {
         toast(`Commande enregistrée : ${euro(montantDe(qq))} HT 🎉`); fermer();
     };
     $('#fCmdAnn') && ($('#fCmdAnn').onclick = async () => { await maj(i.id, { quantites: {}, commande: false }, true); toast('Commande annulée'); rendreFiche(i); });
-    $('#fMail').onclick = () => {
+    $('#fMail').onclick = async () => {
         const to = (i.mail || '').split(';').map(m => m.trim()).filter(Boolean).join(',');
+        // Le mail mis en forme est aussi copié : si la messagerie tronque le texte, il suffit de le coller
+        await copierMail(i, signature()).catch(() => {});
         location.href = `mailto:${to}?subject=${encodeURIComponent(mailObjet())}&body=${encodeURIComponent(mailTexte(i, signature()))}`;
-        if (!i.suivi?.mail) maj(i.id, { mail: true }, true).then(() => toast('Étape « Mail » cochée ✓'));
+        toast('Mail ouvert et copié : en cas de souci, colle-le (Ctrl+V)');
+        if (!i.suivi?.mail) maj(i.id, { mail: true }, true).then(() => setTimeout(() => toast('Étape « Mail » cochée ✓'), 2500));
     };
     $('#fCopie').onclick = async () => {
         try {
