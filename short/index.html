@@ -10,14 +10,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
-   Short 9:16 (1080 × 1920), 20 s — animation pilotée par render(t)
+   Short 4:5 (1080 × 1350, format Instagram), 20 s — animation pilotée par render(t)
    Aperçu : ouvrir la page. Rendu vidéo : short/render.js (Playwright + ffmpeg).
    ============================================================ */
 :root { --ink: #0a0d18; --accent: #ff5f1f; --accent-2: #ff9a3c; --gold: #ffc15a; --grad: linear-gradient(120deg, #ff4d1f 0%, #ff8a2b 55%, #ffc15a 100%); }
 * { box-sizing: border-box; margin: 0; }
 html, body { height: 100%; background: #000; overflow: hidden; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
 body { display: grid; place-items: center; }
-#film { width: 1080px; height: 1920px; position: relative; overflow: hidden; color: #fff; flex: none; transform-origin: center; background: var(--ink); }
+#film { width: 1080px; height: 1350px; position: relative; overflow: hidden; color: #fff; flex: none; transform-origin: center; background: var(--ink); }
 .abs { position: absolute; }
 .layer { position: absolute; inset: 0; will-change: transform, opacity; }
 .c { left: 0; right: 0; text-align: center; }
@@ -29,23 +29,23 @@ body { display: grid; place-items: center; }
 #grain { position: absolute; inset: 0; opacity: .06; background-image: radial-gradient(rgba(255,255,255,.8) 1px, transparent 1px); background-size: 6px 6px; }
 #vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%); }
 #sun { width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle at 40% 40%, #ffd27a, #ff7a2b 60%, #ff4d1f); box-shadow: 0 0 160px 40px rgba(255, 122, 43, .55); left: 390px; }
-#moon { width: 170px; height: 170px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #dfe6ff 55%, #aab6e8); box-shadow: 0 0 80px 10px rgba(200, 215, 255, .35); left: 760px; top: 250px; }
-#moon::after { content: ''; position: absolute; width: 150px; height: 150px; border-radius: 50%; background: var(--ink); left: 55px; top: -20px; opacity: .92; }
-#horizon { left: 0; right: 0; top: 1180px; height: 760px; background: linear-gradient(180deg, #0c1022 0%, #070914 100%); }
+#moon { width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #dfe6ff 55%, #aab6e8); box-shadow: 0 0 80px 10px rgba(200, 215, 255, .35); left: 790px; top: 120px; }
+#moon::after { content: ''; position: absolute; width: 132px; height: 132px; border-radius: 50%; background: var(--ink); left: 55px; top: -20px; opacity: .92; }
+#horizon { left: 0; right: 0; top: 880px; height: 470px; background: linear-gradient(180deg, #0c1022 0%, #070914 100%); }
 #horizon svg { position: absolute; left: 0; top: -150px; }
 .big { font-size: 104px; font-weight: 800; letter-spacing: -.045em; line-height: 1.02; }
 .mid { font-size: 66px; font-weight: 800; letter-spacing: -.035em; line-height: 1.08; }
 .small { font-size: 40px; font-weight: 600; color: rgba(255,255,255,.75); line-height: 1.35; }
 .eyebrow { font-size: 32px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-2); }
 .word { display: inline-block; will-change: transform, opacity; }
-.icon-card { width: 380px; height: 380px; border-radius: 56px; background: rgba(255,255,255,.06); border: 2px solid rgba(255,255,255,.12); display: grid; place-items: center; }
-.icon-card svg { width: 190px; height: 190px; }
-.icon-label { font-size: 44px; font-weight: 800; margin-top: 30px; text-align: center; }
-.prod { left: 90px; width: 900px; height: 1080px; top: 470px; border-radius: 64px; overflow: hidden; box-shadow: 0 60px 120px -40px rgba(0,0,0,.9); background: #111; }
+.icon-card { width: 300px; height: 300px; border-radius: 48px; background: rgba(255,255,255,.06); border: 2px solid rgba(255,255,255,.12); display: grid; place-items: center; }
+.icon-card svg { width: 150px; height: 150px; }
+.icon-label { font-size: 40px; font-weight: 800; margin-top: 20px; text-align: center; }
+.prod { left: 150px; width: 780px; height: 860px; top: 250px; border-radius: 64px; overflow: hidden; box-shadow: 0 60px 120px -40px rgba(0,0,0,.9); background: #111; }
 .prod img { width: 100%; height: 100%; object-fit: cover; }
 .prod .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,13,24,0) 35%, rgba(10,13,24,.92) 100%); }
 .prod .info { position: absolute; left: 60px; right: 60px; bottom: 60px; }
-.prod .nm { font-size: 92px; font-weight: 800; letter-spacing: -.04em; }
+.prod .nm { font-size: 84px; font-weight: 800; letter-spacing: -.04em; }
 .prod .tags { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 22px; }
 .prod .tag { font-size: 34px; font-weight: 800; padding: 12px 24px; border-radius: 999px; background: rgba(255,255,255,.12); backdrop-filter: blur(8px); }
 .prod .tag.hot { background: var(--grad); }
@@ -56,10 +56,10 @@ body { display: grid; place-items: center; }
 .check i svg { width: 58px; height: 58px; }
 .cta { display: inline-flex; align-items: center; gap: 24px; font-size: 66px; font-weight: 800; padding: 40px 70px; border-radius: 999px; background: var(--grad); box-shadow: 0 30px 80px -20px rgba(255,95,31,.9); }
 .tagsline { font-size: 30px; font-weight: 700; color: rgba(255,255,255,.55); line-height: 1.6; }
-#logoWrap { left: 190px; width: 700px; top: 760px; }
+#logoWrap { left: 190px; width: 700px; top: 440px; }
 #logo { width: 700px; height: auto; display: block; }
 #sweep { position: absolute; top: -30px; width: 16px; height: 222px; border-radius: 8px; background: linear-gradient(180deg, transparent, #ffc15a, #ff5f1f, transparent); box-shadow: 0 0 40px 10px rgba(255,140,40,.6); }
-#line { left: 290px; width: 500px; height: 8px; top: 990px; border-radius: 4px; background: var(--grad); transform-origin: left center; }
+#line { left: 290px; width: 500px; height: 8px; top: 670px; border-radius: 4px; background: var(--grad); transform-origin: left center; }
 </style>
 </head>
 <body>
@@ -76,49 +76,49 @@ body { display: grid; place-items: center; }
 
     <!-- Scène 1 : accroche -->
     <div class="layer" id="s1">
-        <div class="abs c" style="top:430px;padding:0 70px"><div class="big" id="s1a"></div></div>
-        <div class="abs c" style="top:760px;padding:0 70px"><div class="mid" id="s1b"></div></div>
-        <div class="abs c" style="top:1000px;font-size:150px" id="s1c">⚠️🔑</div>
+        <div class="abs c" style="top:240px;padding:0 70px"><div class="big" id="s1a"></div></div>
+        <div class="abs c" style="top:540px;padding:0 70px"><div class="mid" id="s1b"></div></div>
+        <div class="abs c" style="top:730px;font-size:120px" id="s1c">⚠️🔑</div>
     </div>
 
     <!-- Scène 2 : maison / travail, la faille -->
     <div class="layer" id="s2">
-        <div class="abs" id="s2home" style="left:110px;top:420px">
+        <div class="abs" id="s2home" style="left:170px;top:110px">
             <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></div>
             <div class="icon-label">À la maison</div>
         </div>
-        <div class="abs" id="s2work" style="left:590px;top:420px">
+        <div class="abs" id="s2work" style="left:610px;top:110px">
             <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="11" height="18" rx="1"/><path d="M15 9h5v12h-5"/><path d="M7.5 7h1M11 7h1M7.5 11h1M11 11h1M7.5 15h1M11 15h1"/><path d="M9 21v-3h1.5v3"/></svg></div>
             <div class="icon-label">comme au travail</div>
         </div>
-        <div class="abs" id="s2lock" style="left:390px;top:1030px;width:300px;height:340px">
-            <svg viewBox="0 0 120 136" width="300" height="340" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <div class="abs" id="s2lock" style="left:430px;top:580px;width:220px;height:250px">
+            <svg viewBox="0 0 120 136" width="220" height="250" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M32 58V40a28 28 0 0 1 56 0v18" stroke="#fff" stroke-width="9" id="shackle"/>
-                <rect x="14" y="58" width="92" height="72" rx="16" fill="rgba(255,255,255,.08)" stroke="#fff" stroke-width="8"/>
+                <rect x="14" y="58" width="92" height="72" rx="16" fill="#161c33" stroke="#fff" stroke-width="8"/>
                 <path id="crack" d="M58 62 L50 80 L64 90 L52 108 L62 126" stroke="#ff5f1f" stroke-width="7"/>
             </svg>
         </div>
-        <div class="abs c" style="top:1440px;padding:0 80px"><div class="mid" id="s2t">Une serrure fragilisée peut vite devenir <span class="grad">une faille.</span></div></div>
+        <div class="abs c" style="top:900px;padding:0 90px"><div class="mid" id="s2t" style="font-size:60px">Une serrure fragilisée peut vite devenir <span class="grad">une faille.</span></div></div>
     </div>
 
     <!-- Scène 3 : produits -->
     <div class="layer" id="s3">
-        <div class="abs c" style="top:190px"><div class="eyebrow" id="s3e">Des accès à la hauteur</div></div>
-        <div class="abs c" style="top:260px"><div class="mid" id="s3t" style="font-size:60px">Serrures de haute sécurité</div></div>
+        <div class="abs c" style="top:80px"><div class="eyebrow" id="s3e">Des accès à la hauteur</div></div>
+        <div class="abs c" style="top:140px"><div class="mid" id="s3t" style="font-size:56px">Serrures de haute sécurité</div></div>
         <div class="abs prod" id="p1"><img src="../img/presence2.webp" alt=""><div class="shade"></div><div class="a2p">A2P <b>★</b></div>
             <div class="info"><div class="nm">Présence 2</div><div class="tags"><span class="tag hot">5 à 7 points</span><span class="tag">Entrebâilleur</span><span class="tag">Clés brevetées</span></div></div></div>
         <div class="abs prod" id="p2"><img src="../img/presence3.webp" alt=""><div class="shade"></div><div class="a2p">A2P <b>★★★</b></div>
             <div class="info"><div class="nm">Présence 3</div><div class="tags"><span class="tag hot">7 à 9 points</span><span class="tag">Anti-sciage</span><span class="tag">Silencieuse</span></div></div></div>
         <div class="abs prod" id="p3"><img src="../img/serenis710.webp" alt=""><div class="shade"></div><div class="a2p">A2P <b>★★★</b></div>
             <div class="info"><div class="nm">Sérénis 710</div><div class="tags"><span class="tag hot">Anti-perçage</span><span class="tag">Anti-arrachage</span><span class="tag">Clés inox</span></div></div></div>
-        <div class="abs c" style="top:1640px"><div class="small" id="s3f">🇫🇷 Montées à la main en France</div></div>
+        <div class="abs c" style="top:1160px"><div class="small" id="s3f">🇫🇷 Montées à la main en France</div></div>
     </div>
 
     <!-- Scène 4 : le service -->
     <div class="layer" id="s4">
-        <div class="abs c" style="top:380px"><div class="eyebrow" id="s4e">Votre Installateur Agréé Picard</div></div>
-        <div class="abs c" style="top:460px;padding:0 70px"><div class="big" id="s4t" style="font-size:96px">Nous intervenons <span class="grad">chez vous</span></div></div>
-        <div class="abs" style="left:110px;right:90px;top:860px;display:grid;gap:64px">
+        <div class="abs c" style="top:170px"><div class="eyebrow" id="s4e">Votre Installateur Agréé Picard</div></div>
+        <div class="abs c" style="top:240px;padding:0 70px"><div class="big" id="s4t" style="font-size:92px">Nous intervenons<br><span class="grad">chez vous</span></div></div>
+        <div class="abs" style="left:120px;right:90px;top:620px;display:grid;gap:46px">
             <div class="check" id="k1"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i>Sécurisation de vos portes</div>
             <div class="check" id="k2"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i>Conseil sur le bon niveau de protection</div>
             <div class="check" id="k3"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i>Pose dans les règles de l’art</div>
@@ -127,17 +127,17 @@ body { display: grid; place-items: center; }
 
     <!-- Scène 5 : appel à l'action -->
     <div class="layer" id="s5">
-        <div class="abs c" style="top:640px;padding:0 80px"><div class="big" id="s5t">Parlons de votre sécurité <span class="grad">dès maintenant</span></div></div>
-        <div class="abs c" style="top:1140px"><div class="cta" id="s5b">📱 Contactez-nous</div></div>
-        <div class="abs c" style="top:1380px;padding:0 120px"><div class="tagsline" id="s5h">#SécuritéMaison #SécuritéEntreprise #SerrurierAgréé #Vigilance #PicardSerrures</div></div>
+        <div class="abs c" style="top:300px;padding:0 80px"><div class="big" id="s5t">Parlons de votre sécurité <span class="grad">dès maintenant</span></div></div>
+        <div class="abs c" style="top:760px"><div class="cta" id="s5b">📱 Contactez-nous</div></div>
+        <div class="abs c" style="top:1010px;padding:0 120px"><div class="tagsline" id="s5h">#SécuritéMaison #SécuritéEntreprise #SerrurierAgréé #Vigilance #PicardSerrures</div></div>
     </div>
 
     <!-- Scène 6 : sortie Picard Serrures -->
     <div class="layer" id="s6">
         <div class="abs" id="logoWrap"><img id="logo" src="../img/logo-picard.png" alt="Picard Serrures"><div id="sweep"></div></div>
         <div class="abs" id="line"></div>
-        <div class="abs c" style="top:1040px"><div class="small" id="s6t" style="font-size:38px">Fabricant de haute sécurité depuis 1720</div></div>
-        <div class="abs c" style="top:1420px"><div class="cta" id="s6c" style="font-size:44px;padding:28px 50px">📱 Contactez votre installateur agréé</div></div>
+        <div class="abs c" style="top:720px"><div class="small" id="s6t" style="font-size:38px">Fabricant de haute sécurité depuis 1720</div></div>
+        <div class="abs c" style="top:1000px"><div class="cta" id="s6c" style="font-size:44px;padding:28px 50px">📱 Contactez votre installateur agréé</div></div>
     </div>
     <div id="vignette"></div>
 </div>
@@ -174,11 +174,11 @@ function render(t) {
     const n = eio(p(t, 0, 3.2));
     const top = mixC([255, 140, 70], [10, 13, 24], n), mid = mixC([120, 60, 90], [16, 20, 40], n), bot = mixC([40, 24, 50], [10, 13, 24], n);
     $('sky').style.background = `linear-gradient(180deg, rgb(${top}) 0%, rgb(${mid}) 45%, rgb(${bot}) 100%)`;
-    $('sun').style.top = `${mix(720, 1250, eio(p(t, 0, 2.8)))}px`; $('sun').style.opacity = 1 - p(t, 2.2, 3.0);
-    set($('moon'), { o: eo(p(t, 1.6, 2.8)) * (1 - p(t, 6.6, 7.2)), y: (1 - eo(p(t, 1.6, 2.8))) * 80 });
+    $('sun').style.top = `${mix(470, 950, eio(p(t, 0, 2.8)))}px`; $('sun').style.opacity = 1 - p(t, 2.2, 3.0);
+    set($('moon'), { o: eo(p(t, 1.6, 2.8)) * (1 - p(t, 3.0, 3.5)), y: (1 - eo(p(t, 1.6, 2.8))) * 80 });
     const hz = 1 - eo(p(t, 6.6, 7.4)); set($('horizon'), { o: hz, y: (1 - hz) * 200 });
-    set($('glow1'), { x: 300 + Math.sin(t * .5) * 120, y: (t < 7 ? 1300 : -200) + Math.cos(t * .4) * 100, o: .35 + .65 * p(t, 2.5, 4), blur: 140 });
-    set($('glow2'), { x: -200 + Math.cos(t * .45) * 100, y: (t < 12 ? 200 : 1300) + Math.sin(t * .35) * 120, o: p(t, 3, 5), blur: 140 });
+    set($('glow1'), { x: 300 + Math.sin(t * .5) * 120, y: (t < 7 ? 850 : -250) + Math.cos(t * .4) * 80, o: .35 + .65 * p(t, 2.5, 4), blur: 140 });
+    set($('glow2'), { x: -200 + Math.cos(t * .45) * 100, y: (t < 12 ? 50 : 850) + Math.sin(t * .35) * 90, o: p(t, 3, 5), blur: 140 });
 
     // ─── Scène 1 (0 → 3,4 s) ───
     const s1o = 1 - ei(p(t, 3.0, 3.4)); set($('s1'), { o: s1o, y: -ei(p(t, 3.0, 3.4)) * 120 });
@@ -231,7 +231,7 @@ function render(t) {
 }
 
 // Aperçu en boucle (désactivé pour le rendu vidéo : ?render)
-function ajuster() { const k = Math.min(innerWidth / 1080, innerHeight / 1920); $('film').style.transform = `scale(${k})`; }
+function ajuster() { const k = Math.min(innerWidth / 1080, innerHeight / 1350); $('film').style.transform = `scale(${k})`; }
 window.RENDER = location.search.includes('render');
 if (!window.RENDER) {
     addEventListener('resize', ajuster); ajuster();

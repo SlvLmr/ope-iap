@@ -152,9 +152,9 @@
     .kit .apercu { padding: 22px; overflow: auto; flex: 1; }
     .kit footer { padding: 14px 22px; border-top: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .kit footer .muted { font-size: 12px; flex: 1; min-width: 200px; }
-    .postgrid { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 22px; align-items: start; }
+    .postgrid { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 22px; align-items: start; }
     .postgrid .vid { display: grid; gap: 10px; }
-    .postgrid video { width: 100%; aspect-ratio: 9 / 16; border-radius: 16px; background: #000; display: block; }
+    .postgrid video { width: 100%; aspect-ratio: 4 / 5; border-radius: 16px; background: #000; display: block; }
     .postgrid .btn { width: 100%; }
     @media (max-width: 700px) { .postgrid { grid-template-columns: 1fr; } .postgrid video { max-height: 60vh; width: auto; margin: 0 auto; } }
 
@@ -409,12 +409,12 @@
 <div class="kit hidden" id="kitPost"><div class="sheet" style="max-width:960px">
     <header><h3>🎬 Post & vidéo réseaux sociaux · pages des IAP</h3><button class="btn sm ghost" data-close>✕</button></header>
     <div class="apercu postgrid">
-        <div class="vid"><video id="postVid" src="short/short-coup-de-boost.mp4" poster="short/poster.jpg" controls playsinline preload="none"></video>
-            <a class="btn primary" href="short/short-coup-de-boost.mp4" download="Picard-short-securite-20s.mp4">⬇ Télécharger la vidéo (MP4, 20 s)</a></div>
+        <div class="vid"><video id="postVid" src="short/short-coup-de-boost-4x5.mp4" poster="short/poster.jpg" controls playsinline preload="none"></video>
+            <a class="btn primary" href="short/short-coup-de-boost-4x5.mp4" download="Picard-video-securite-20s-4x5.mp4">⬇ Télécharger la vidéo (MP4 4:5, 20 s)</a></div>
         <div><div id="postTxt" style="white-space:pre-wrap;font-size:15px;line-height:1.55;background:var(--surface-2);border-radius:14px;padding:18px"></div>
             <button class="btn primary" id="postCop" style="margin-top:12px">Copier le post</button></div>
     </div>
-    <footer><span class="muted">À publier sur Facebook, Instagram, TikTok ou LinkedIn : la vidéo en Reel / Short, le post en texte d’accompagnement. Vidéo sans musique : en ajouter une dans l’application.</span></footer>
+    <footer><span class="muted">À publier sur Facebook, Instagram, TikTok ou LinkedIn : la vidéo au format Instagram 4:5 (fil d’actualité et Reels), le post en texte d’accompagnement. Vidéo sans musique : en ajouter une dans l’application.</span></footer>
 </div></div>
 
 <nav class="nav">

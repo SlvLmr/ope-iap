@@ -1,10 +1,10 @@
 /* Rendu vidéo du short : node short/render.js [sortie.mp4]
-   Sert le dossier du projet, calcule chaque image avec render(t) et l'encode en MP4 (H.264, 30 i/s, 1080 × 1920). */
+   Sert le dossier du projet, calcule chaque image avec render(t) et l'encode en MP4 (H.264, 30 i/s, 1080 × 1350, format Instagram 4:5). */
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
 const http = require('http'), fs = require('fs'), path = require('path');
 const RACINE = path.resolve(__dirname, '..'), FPS = 30, DUREE = 20;
-const sortie = path.resolve(process.argv[2] || path.join(__dirname, 'short-coup-de-boost.mp4'));
+const sortie = path.resolve(process.argv[2] || path.join(__dirname, 'short-coup-de-boost-4x5.mp4'));
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
 const serveur = http.createServer((q, r) => {
     const f = path.join(RACINE, decodeURIComponent(q.url.split('?')[0]));
@@ -16,7 +16,7 @@ const serveur = http.createServer((q, r) => {
     const port = serveur.address().port;
     const proxy = process.env.HTTPS_PROXY ? { server: process.env.HTTPS_PROXY, bypass: '127.0.0.1,localhost' } : undefined;
     const b = await chromium.launch({ proxy });
-    const page = await b.newPage({ viewport: { width: 1080, height: 1920 } });
+    const page = await b.newPage({ viewport: { width: 1080, height: 1350 } });
     await page.goto(`http://127.0.0.1:${port}/short/index.html?render`, { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(500);
     const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-',
