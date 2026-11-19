@@ -166,17 +166,58 @@ $('#objectifs').addEventListener('change', async e => {
     catch (err) { toast(err.message, true); }
 });
 
+// Mail d'envoi du code à un ATC (ouvert dans Outlook)
+const urlSite = () => location.origin + location.pathname.replace(/[^/]*$/, '');
+function mailCode(c) {
+    const n = S.data.iap.filter(i => i.atc === c.nom).length;
+    const objet = '🚀 Opération « Coup de boost » IAP : ton accès personnel';
+    const corps = `Bonjour ${c.prenom || c.nom},
+
+L’opération « Coup de boost » est active du lundi 23 novembre au vendredi 27 novembre 2026 (jusqu’à 18h).
+
+Ton espace personnel est prêt. Tu y retrouves :
+• tes ${n} IAP avec leurs coordonnées,
+• ta to-do phoning : Date / Appel / Mail / Présentation / Commande,
+• le mail type, le bon de commande et le post réseaux sociaux à copier,
+• ton objectif annuel et ce que l’opération y apporte.
+
+👉 Ton lien direct (connexion automatique) :
+${lienAtc(c.code)}
+
+🔑 Ton code personnel : ${c.code}
+(à saisir sur ${urlSite()}atc.html si tu ouvres le site sans le lien)
+
+Ce code est personnel : merci de ne pas le partager. Le site fonctionne aussi sur téléphone.
+
+Pour revoir la présentation de l’opération : ${urlSite()}
+
+À vos carnets de commandes, et bon boost !
+
+La direction commerciale
+Picard Serrures`;
+    return `mailto:${encodeURIComponent(c.email || '')}?subject=${encodeURIComponent(objet)}&body=${encodeURIComponent(corps)}`;
+}
+
 function rendreCodes() {
     rendreObjectifs();
     const ROLE = { atc: 'ATC', adv: 'ADV', direction: 'Direction' };
-    $('#codes').innerHTML = `<thead><tr><th>Nom</th><th>Rôle</th><th>Code</th><th>Dernière connexion</th><th></th></tr></thead><tbody>` +
-        S.codes.map(c => `<tr style="${c.actif ? '' : 'opacity:.5'}"><td><b>${esc(c.nom)}</b></td><td>${ROLE[c.role]}</td><td><span class="code">${esc(c.code)}</span></td>
+    $('#codes').innerHTML = `<thead><tr><th>Nom</th><th>Rôle</th><th>Code</th><th>E-mail</th><th>Dernière connexion</th><th></th></tr></thead><tbody>` +
+        S.codes.map(c => `<tr style="${c.actif ? '' : 'opacity:.5'}"><td><b>${esc(c.nom)}</b>${c.prenom ? `<div class="muted" style="font-size:12px">${esc(c.prenom)}</div>` : ''}</td><td>${ROLE[c.role]}</td><td><span class="code">${esc(c.code)}</span></td>
+        <td><input class="mail-in" type="email" value="${esc(c.email || '')}" placeholder="adresse e-mail" data-mail-nom="${esc(c.nom)}" data-mail-role="${c.role}"></td>
         <td class="muted" style="font-size:12px">${c.derniere_connexion ? heure(c.derniere_connexion) : 'jamais'}</td>
-        <td class="r" style="white-space:nowrap">${c.role === 'atc' ? `<button class="btn sm" data-copy="${esc(c.code)}">Copier le lien</button>` : ''}
+        <td class="r" style="white-space:nowrap">${c.role === 'atc' ? `<button class="btn sm primary" data-envoi="${esc(c.code)}" ${c.email && c.actif ? '' : 'disabled'} title="${c.email ? 'Ouvre Outlook avec le mail et le code' : 'Renseignez l’e-mail'}">✉️ Envoyer le mail</button>
+        <button class="btn sm" data-copy="${esc(c.code)}">Copier le lien</button>` : ''}
         ${c.nom === S.moi.nom && c.role === S.moi.role ? '' : `<button class="btn sm" data-act="regenerer" data-nom="${esc(c.nom)}" data-role="${c.role}">Régénérer</button>
         <button class="btn sm" data-act="${c.actif ? 'desactiver' : 'activer'}" data-nom="${esc(c.nom)}" data-role="${c.role}">${c.actif ? 'Désactiver' : 'Activer'}</button>`}</td></tr>`).join('') + '</tbody>';
 }
+$('#codes').addEventListener('change', async e => {
+    const inp = e.target.closest('[data-mail-nom]'); if (!inp) return;
+    try { S.codes = await API.emailMaj(inp.dataset.mailNom, inp.dataset.mailRole, inp.value); rendreCodes(); toast('E-mail enregistré'); }
+    catch (err) { toast(err.message, true); rendreCodes(); }
+});
 $('#codes').addEventListener('click', async e => {
+    const env = e.target.closest('[data-envoi]');
+    if (env) { const c = S.codes.find(x => x.code === env.dataset.envoi); location.href = mailCode(c); env.textContent = '✉️ Mail ouvert ✓'; return; }
     const cp = e.target.closest('[data-copy]');
     if (cp) { await navigator.clipboard.writeText(lienAtc(cp.dataset.copy)); toast('Lien copié : il connecte directement l’ATC.'); return; }
     const b = e.target.closest('[data-act]'); if (!b) return;

@@ -27,7 +27,7 @@ Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glis
 ### Suivi
 - Indicateurs (CA, commandes, serrures vendues, panier moyen, IAP appelés, reste à faire des ATC), entonnoir, ventes par référence, classement des ATC avec CA actuel / objectif / reste à faire / atteinte, activité récente. Actualisation chaque minute.
 - Détail de tous les IAP, filtres, **exports Excel** (commandes pour l’ADV, suivi complet).
-- Direction uniquement : bouton **« Importer le fichier des IAP »** en haut de page (aperçu avant validation : nouveaux, mis à jour, retirés, changements d’ATC ; modèle Excel téléchargeable), **objectifs annuels** (CA actuel et objectif par ATC, modifiables), **codes d’accès** (copier les liens, régénérer, désactiver, créer) et **import du listing IAP** (même format que « Listing IAP 2026 »).
+- Direction uniquement : bouton **« Importer le fichier des IAP »** en haut de page (aperçu avant validation : nouveaux, mis à jour, retirés, changements d’ATC ; modèle Excel téléchargeable), **objectifs annuels** (CA actuel et objectif par ATC, modifiables), **codes d’accès** (bouton **« Envoyer le mail »** par ATC : ouvre Outlook avec le lien, le code et les explications ; e-mail modifiable ; copier les liens, régénérer, désactiver, créer) et **import du listing IAP** (même format que « Listing IAP 2026 »).
 
 Toutes les pages sont utilisables sur téléphone (bon de commande compris : une carte par référence).
 

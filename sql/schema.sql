@@ -337,3 +337,17 @@ begin
   insert into public.boost_journal (par, action, detail) values (a.nom, 'import', jsonb_build_object('lignes', nb, 'ignorees_atc_retire', ign));
   return jsonb_build_object('lignes', nb, 'ignorees', ign);
 end $$;
+
+-- Évolution : e-mail des accès (envoi du code depuis le suivi)
+create or replace function public.boost_email_maj(p_code text, p_nom text, p_role text, p_email text)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare a public.boost_acces;
+begin
+  a := public.boost_qui(p_code);
+  if a.role <> 'direction' then raise exception 'Accès réservé à la direction.'; end if;
+  if nullif(trim(p_email), '') is not null and trim(p_email) !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' then raise exception 'Adresse e-mail invalide.'; end if;
+  update public.boost_acces set email = lower(nullif(trim(p_email), '')) where nom = p_nom and role = p_role and not retire;
+  if not found then raise exception 'Accès introuvable : %', p_nom; end if;
+  return public.boost_codes(p_code);
+end $$;
+grant execute on function public.boost_email_maj(text, text, text, text) to anon, authenticated;
