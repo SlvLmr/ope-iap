@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Short sécurité Picard</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Short 9:16 (1080 × 1920), 20 s — animation pilotée par render(t)
+   Aperçu : ouvrir la page. Rendu vidéo : short/render.js (Playwright + ffmpeg).
+   ============================================================ */
+:root { --ink: #0a0d18; --accent: #ff5f1f; --accent-2: #ff9a3c; --gold: #ffc15a; --grad: linear-gradient(120deg, #ff4d1f 0%, #ff8a2b 55%, #ffc15a 100%); }
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; background: #000; overflow: hidden; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+body { display: grid; place-items: center; }
+#film { width: 1080px; height: 1920px; position: relative; overflow: hidden; color: #fff; flex: none; transform-origin: center; background: var(--ink); }
+.abs { position: absolute; }
+.layer { position: absolute; inset: 0; will-change: transform, opacity; }
+.c { left: 0; right: 0; text-align: center; }
+.grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+#sky { position: absolute; inset: 0; }
+#glow1, #glow2 { position: absolute; border-radius: 50%; filter: blur(120px); }
+#glow1 { width: 900px; height: 900px; background: rgba(255, 95, 31, .55); }
+#glow2 { width: 800px; height: 800px; background: rgba(59, 108, 246, .35); }
+#grain { position: absolute; inset: 0; opacity: .06; background-image: radial-gradient(rgba(255,255,255,.8) 1px, transparent 1px); background-size: 6px 6px; }
+#vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%); }
+#sun { width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle at 40% 40%, #ffd27a, #ff7a2b 60%, #ff4d1f); box-shadow: 0 0 160px 40px rgba(255, 122, 43, .55); left: 390px; }
+#moon { width: 170px; height: 170px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #dfe6ff 55%, #aab6e8); box-shadow: 0 0 80px 10px rgba(200, 215, 255, .35); left: 760px; top: 250px; }
+#moon::after { content: ''; position: absolute; width: 150px; height: 150px; border-radius: 50%; background: var(--ink); left: 55px; top: -20px; opacity: .92; }
+#horizon { left: 0; right: 0; top: 1180px; height: 760px; background: linear-gradient(180deg, #0c1022 0%, #070914 100%); }
+#horizon svg { position: absolute; left: 0; top: -150px; }
+.big { font-size: 104px; font-weight: 800; letter-spacing: -.045em; line-height: 1.02; }
+.mid { font-size: 66px; font-weight: 800; letter-spacing: -.035em; line-height: 1.08; }
+.small { font-size: 40px; font-weight: 600; color: rgba(255,255,255,.75); line-height: 1.35; }
+.eyebrow { font-size: 32px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-2); }
+.word { display: inline-block; will-change: transform, opacity; }
+.icon-card { width: 380px; height: 380px; border-radius: 56px; background: rgba(255,255,255,.06); border: 2px solid rgba(255,255,255,.12); display: grid; place-items: center; }
+.icon-card svg { width: 190px; height: 190px; }
+.icon-label { font-size: 44px; font-weight: 800; margin-top: 30px; text-align: center; }
+.prod { left: 90px; width: 900px; height: 1080px; top: 470px; border-radius: 64px; overflow: hidden; box-shadow: 0 60px 120px -40px rgba(0,0,0,.9); background: #111; }
+.prod img { width: 100%; height: 100%; object-fit: cover; }
+.prod .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,13,24,0) 35%, rgba(10,13,24,.92) 100%); }
+.prod .info { position: absolute; left: 60px; right: 60px; bottom: 60px; }
+.prod .nm { font-size: 92px; font-weight: 800; letter-spacing: -.04em; }
+.prod .tags { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 22px; }
+.prod .tag { font-size: 34px; font-weight: 800; padding: 12px 24px; border-radius: 999px; background: rgba(255,255,255,.12); backdrop-filter: blur(8px); }
+.prod .tag.hot { background: var(--grad); }
+.prod .a2p { position: absolute; left: 50px; top: 50px; font-size: 38px; font-weight: 800; padding: 14px 26px; border-radius: 999px; background: rgba(10,13,24,.75); }
+.prod .a2p b { color: var(--gold); }
+.check { display: flex; align-items: center; gap: 34px; font-size: 54px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+.check i { flex: none; width: 104px; height: 104px; border-radius: 30px; background: var(--grad); display: grid; place-items: center; font-style: normal; box-shadow: 0 20px 50px -15px rgba(255,95,31,.8); }
+.check i svg { width: 58px; height: 58px; }
+.cta { display: inline-flex; align-items: center; gap: 24px; font-size: 66px; font-weight: 800; padding: 40px 70px; border-radius: 999px; background: var(--grad); box-shadow: 0 30px 80px -20px rgba(255,95,31,.9); }
+.tagsline { font-size: 30px; font-weight: 700; color: rgba(255,255,255,.55); line-height: 1.6; }
+#logoWrap { left: 190px; width: 700px; top: 760px; }
+#logo { width: 700px; height: auto; display: block; }
+#sweep { position: absolute; top: -30px; width: 16px; height: 222px; border-radius: 8px; background: linear-gradient(180deg, transparent, #ffc15a, #ff5f1f, transparent); box-shadow: 0 0 40px 10px rgba(255,140,40,.6); }
+#line { left: 290px; width: 500px; height: 8px; top: 990px; border-radius: 4px; background: var(--grad); transform-origin: left center; }
+</style>
+</head>
+<body>
+<div id="film">
+    <div id="sky"></div>
+    <div id="glow1"></div><div id="glow2"></div>
+    <div class="abs" id="sun"></div>
+    <div class="abs" id="moon"></div>
+    <div class="abs" id="horizon">
+        <svg width="1080" height="160" viewBox="0 0 1080 160"><path d="M0 160 L0 110 L70 110 L70 70 L130 70 L130 95 L190 95 L190 40 L250 40 L250 100 L330 100 L330 60 L360 30 L390 60 L390 100 L470 100 L470 80 L540 80 L540 20 L600 20 L600 90 L680 90 L680 55 L740 55 L740 105 L820 105 L820 65 L850 35 L880 65 L880 100 L960 100 L960 75 L1030 75 L1030 115 L1080 115 L1080 160 Z" fill="#0c1022"/>
+        <g fill="#ffc15a" opacity=".85"><rect x="205" y="60" width="14" height="16"/><rect x="225" y="80" width="14" height="16"/><rect x="555" y="40" width="14" height="16"/><rect x="575" y="65" width="14" height="16"/><rect x="695" y="70" width="14" height="16"/><rect x="345" y="70" width="12" height="14"/><rect x="835" y="75" width="12" height="14"/></g></svg>
+    </div>
+    <div id="grain"></div>
+
+    <!-- Scène 1 : accroche -->
+    <div class="layer" id="s1">
+        <div class="abs c" style="top:430px;padding:0 70px"><div class="big" id="s1a"></div></div>
+        <div class="abs c" style="top:760px;padding:0 70px"><div class="mid" id="s1b"></div></div>
+        <div class="abs c" style="top:1000px;font-size:150px" id="s1c">⚠️🔑</div>
+    </div>
+
+    <!-- Scène 2 : maison / travail, la faille -->
+    <div class="layer" id="s2">
+        <div class="abs" id="s2home" style="left:110px;top:420px">
+            <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></div>
+            <div class="icon-label">À la maison</div>
+        </div>
+        <div class="abs" id="s2work" style="left:590px;top:420px">
+            <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="11" height="18" rx="1"/><path d="M15 9h5v12h-5"/><path d="M7.5 7h1M11 7h1M7.5 11h1M11 11h1M7.5 15h1M11 15h1"/><path d="M9 21v-3h1.5v3"/></svg></div>
+            <div class="icon-label">comme au travail</div>
+        </div>
+        <div class="abs" id="s2lock" style="left:390px;top:1030px;width:300px;height:340px">
+            <svg viewBox="0 0 120 136" width="300" height="340" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M32 58V40a28 28 0 0 1 56 0v18" stroke="#fff" stroke-width="9" id="shackle"/>
+                <rect x="14" y="58" width="92" height="72" rx="16" fill="rgba(255,255,255,.08)" stroke="#fff" stroke-width="8"/>
+                <path id="crack" d="M58 62 L50 80 L64 90 L52 108 L62 126" stroke="#ff5f1f" stroke-width="7"/>
+            </svg>
+        </div>
+        <div class="abs c" style="top:1440px;padding:0 80px"><div class="mid" id="s2t">Une serrure fragilisée peut vite devenir <span class="grad">une faille.</span></div></div>
+    </div>
+
+    <!-- Scène 3 : produits -->
+    <div class="layer" id="s3">
+        <div class="abs c" style="top:190px"><div class="eyebrow" id="s3e">Des accès à la hauteur</div></div>
+        <div class="abs c" style="top:260px"><div class="mid" id="s3t" style="font-size:60px">Serrures de haute sécurité</div></div>
+        <div class="abs prod" id="p1"><img src="../img/presence2.webp" alt=""><div class="shade"></div><div class="a2p">A2P <b>★</b></div>
+            <div class="info"><div class="nm">Présence 2</div><div class="tags"><span class="tag hot">5 à 7 points</span><span class="tag">Entrebâilleur</span><span class="tag">Clés brevetées</span></div></div></div>
+        <div class="abs prod" id="p2"><img src="../img/presence3.webp" alt=""><div class="shade"></div><div class="a2p">A2P <b>★★★</b></div>
+            <div class="info"><div class="nm">Présence 3</div><div class="tags"><span class="tag hot">7 à 9 points</span><span class="tag">Anti-sciage</span><span class="tag">Silencieuse</span></div></div></div>
+        <div class="abs prod" id="p3"><img src="../img/serenis710.webp" alt=""><div class="shade"></div><div class="a2p">A2P <b>★★★</b></div>
+            <div class="info"><div class="nm">Sérénis 710</div><div class="tags"><span class="tag hot">Anti-perçage</span><span class="tag">Anti-arrachage</span><span class="tag">Clés inox</span></div></div></div>
+        <div class="abs c" style="top:1640px"><div class="small" id="s3f">🇫🇷 Montées à la main en France</div></div>
+    </div>
+
+    <!-- Scène 4 : le service -->
+    <div class="layer" id="s4">
+        <div class="abs c" style="top:380px"><div class="eyebrow" id="s4e">Votre Installateur Agréé Picard</div></div>
+        <div class="abs c" style="top:460px;padding:0 70px"><div class="big" id="s4t" style="font-size:96px">Nous intervenons <span class="grad">chez vous</span></div></div>
+        <div class="abs" style="left:110px;right:90px;top:860px;display:grid;gap:64px">
+            <div class="check" id="k1"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i>Sécurisation de vos portes</div>
+            <div class="check" id="k2"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i>Conseil sur le bon niveau de protection</div>
+            <div class="check" id="k3"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i>Pose dans les règles de l’art</div>
+        </div>
+    </div>
+
+    <!-- Scène 5 : appel à l'action -->
+    <div class="layer" id="s5">
+        <div class="abs c" style="top:640px;padding:0 80px"><div class="big" id="s5t">Parlons de votre sécurité <span class="grad">dès maintenant</span></div></div>
+        <div class="abs c" style="top:1140px"><div class="cta" id="s5b">📱 Contactez-nous</div></div>
+        <div class="abs c" style="top:1380px;padding:0 120px"><div class="tagsline" id="s5h">#SécuritéMaison #SécuritéEntreprise #SerrurierAgréé #Vigilance #PicardSerrures</div></div>
+    </div>
+
+    <!-- Scène 6 : sortie Picard Serrures -->
+    <div class="layer" id="s6">
+        <div class="abs" id="logoWrap"><img id="logo" src="../img/logo-picard.png" alt="Picard Serrures"><div id="sweep"></div></div>
+        <div class="abs" id="line"></div>
+        <div class="abs c" style="top:1040px"><div class="small" id="s6t" style="font-size:38px">Fabricant de haute sécurité depuis 1720</div></div>
+        <div class="abs c" style="top:1420px"><div class="cta" id="s6c" style="font-size:44px;padding:28px 50px">📱 Contactez votre installateur agréé</div></div>
+    </div>
+    <div id="vignette"></div>
+</div>
+
+<script>
+const DUREE = 20, $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const p = (t, a, b) => clamp((t - a) / (b - a));
+const eo = x => 1 - Math.pow(1 - x, 3);                         // ease-out cubic
+const ei = x => x * x * x;                                      // ease-in cubic
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const mix = (a, b, k) => a + (b - a) * k;
+const mixC = (c1, c2, k) => c1.map((v, i) => Math.round(mix(v, c2[i], k)));
+function set(el, { o = 1, x = 0, y = 0, s = 1, r = 0, blur = 0 } = {}) {
+    el.style.opacity = o; el.style.transform = `translate(${x}px, ${y}px) scale(${s}) rotate(${r}deg)`;
+    el.style.filter = blur > .05 ? `blur(${blur}px)` : 'none';
+}
+// Entrée (montée + apparition) puis sortie (vers le haut)
+function io(el, t, a, b, c, d, dist = 70) {
+    const i = eo(p(t, a, b)), o = ei(p(t, c, d));
+    set(el, { o: i * (1 - o), y: (1 - i) * dist - o * dist, blur: (1 - i) * 10 + o * 10 });
+    return i * (1 - o);
+}
+// Texte animé mot à mot
+function mots(el, html) { el.innerHTML = html.split(' ').map(w => `<span class="word">${w}</span>`).join(' '); return [...el.querySelectorAll('.word')]; }
+const W1 = mots($('s1a'), 'Les jours raccourcissent…');
+// Ligne 2 : mots posés à la main (le mot en dégradé garde sa classe)
+$('s1b').innerHTML = '<span class="word">…et</span> <span class="word">les</span> <span class="word">risques</span> <span class="word grad">d’intrusion</span> <span class="word">augmentent.</span>';
+const W2b = [...$('s1b').querySelectorAll('.word')];
+
+function render(t) {
+    // ─── Ciel : crépuscule → nuit ───
+    const n = eio(p(t, 0, 3.2));
+    const top = mixC([255, 140, 70], [10, 13, 24], n), mid = mixC([120, 60, 90], [16, 20, 40], n), bot = mixC([40, 24, 50], [10, 13, 24], n);
+    $('sky').style.background = `linear-gradient(180deg, rgb(${top}) 0%, rgb(${mid}) 45%, rgb(${bot}) 100%)`;
+    $('sun').style.top = `${mix(720, 1250, eio(p(t, 0, 2.8)))}px`; $('sun').style.opacity = 1 - p(t, 2.2, 3.0);
+    set($('moon'), { o: eo(p(t, 1.6, 2.8)) * (1 - p(t, 6.6, 7.2)), y: (1 - eo(p(t, 1.6, 2.8))) * 80 });
+    const hz = 1 - eo(p(t, 6.6, 7.4)); set($('horizon'), { o: hz, y: (1 - hz) * 200 });
+    set($('glow1'), { x: 300 + Math.sin(t * .5) * 120, y: (t < 7 ? 1300 : -200) + Math.cos(t * .4) * 100, o: .35 + .65 * p(t, 2.5, 4), blur: 140 });
+    set($('glow2'), { x: -200 + Math.cos(t * .45) * 100, y: (t < 12 ? 200 : 1300) + Math.sin(t * .35) * 120, o: p(t, 3, 5), blur: 140 });
+
+    // ─── Scène 1 (0 → 3,4 s) ───
+    const s1o = 1 - ei(p(t, 3.0, 3.4)); set($('s1'), { o: s1o, y: -ei(p(t, 3.0, 3.4)) * 120 });
+    W1.forEach((w, i) => { const k = eo(p(t, .2 + i * .18, .75 + i * .18)); set(w, { o: k, y: (1 - k) * 60, blur: (1 - k) * 12 }); });
+    W2b.forEach((w, i) => { const k = eo(p(t, 1.3 + i * .12, 1.8 + i * .12)); set(w, { o: k, y: (1 - k) * 50, blur: (1 - k) * 10 }); });
+    const k1 = p(t, 2.1, 2.6); set($('s1c'), { o: Math.min(1, k1 * 3), s: k1 ? back(k1) : .3, r: Math.sin(t * 14) * 4 * (1 - p(t, 2.6, 3.2)) });
+
+    // ─── Scène 2 (3,4 → 7 s) ───
+    const s2out = ei(p(t, 6.6, 7.0)); set($('s2'), { o: (t >= 3.3 ? 1 : 0) * (1 - s2out), y: -s2out * 120 });
+    const h = eo(p(t, 3.5, 4.1)), w = eo(p(t, 3.8, 4.4));
+    set($('s2home'), { o: h, x: (1 - h) * -160, s: .9 + .1 * h });
+    set($('s2work'), { o: w, x: (1 - w) * 160, s: .9 + .1 * w });
+    const l = eo(p(t, 4.4, 4.9)); set($('s2lock'), { o: l, s: .7 + .3 * back(p(t, 4.4, 4.9)), x: p(t, 5.2, 5.9) > 0 && p(t, 5.2, 5.9) < 1 ? Math.sin(t * 60) * 6 : 0 });
+    const cr = $('crack'), len = 90; cr.style.strokeDasharray = len; cr.style.strokeDashoffset = len * (1 - eio(p(t, 5.1, 5.8)));
+    io($('s2t'), t, 5.2, 5.8, 9, 9.1);
+
+    // ─── Scène 3 (7 → 12,4 s) ───
+    const s3out = ei(p(t, 12.1, 12.5)); set($('s3'), { o: (t >= 6.9 ? 1 : 0) * (1 - s3out), y: -s3out * 120 });
+    io($('s3e'), t, 7.0, 7.5, 99, 100); io($('s3t'), t, 7.15, 7.65, 99, 100); io($('s3f'), t, 8.0, 8.5, 99, 100, 40);
+    [['p1', 7.2], ['p2', 8.95], ['p3', 10.7]].forEach(([id, a], i) => {
+        const inn = eo(p(t, a, a + .55)), out = i < 2 ? eio(p(t, a + 1.55, a + 2.0)) : 0;
+        set($(id), { o: inn * (1 - out * .9), x: (1 - inn) * 1100 - out * 1100, r: (1 - inn) * 6 - out * 6, s: 1 - out * .1 });
+        $(id).querySelector('img').style.transform = `scale(${1.12 - .12 * p(t, a, a + 2)})`;
+        $(id).querySelectorAll('.tag').forEach((g, j) => { const k = eo(p(t, a + .35 + j * .1, a + .7 + j * .1)); set(g, { o: k, y: (1 - k) * 30 }); });
+    });
+
+    // ─── Scène 4 (12,4 → 15,4 s) ───
+    const s4out = ei(p(t, 15.0, 15.4)); set($('s4'), { o: (t >= 12.3 ? 1 : 0) * (1 - s4out), y: -s4out * 120 });
+    io($('s4e'), t, 12.45, 12.95, 99, 100); io($('s4t'), t, 12.6, 13.1, 99, 100);
+    ['k1', 'k2', 'k3'].forEach((id, i) => {
+        const k = eo(p(t, 13.1 + i * .38, 13.6 + i * .38)); set($(id), { o: k, x: (1 - k) * -120 });
+        const ic = $(id).querySelector('i'); const b = p(t, 13.1 + i * .38, 13.55 + i * .38); ic.style.transform = `scale(${b ? back(b) : 0})`;
+    });
+
+    // ─── Scène 5 (15,4 → 17,8 s) : CTA ───
+    const s5out = ei(p(t, 17.5, 17.9)); set($('s5'), { o: (t >= 15.3 ? 1 : 0) * (1 - s5out), s: 1 + s5out * .06 });
+    io($('s5t'), t, 15.45, 15.95, 99, 100);
+    const bt = p(t, 15.9, 16.35); set($('s5b'), { o: Math.min(1, bt * 2), s: bt ? back(bt) * (1 + Math.max(0, Math.sin((t - 16.4) * 7)) * .045 * (t > 16.4 ? 1 : 0)) : .5 });
+    io($('s5h'), t, 16.4, 16.9, 99, 100, 30);
+
+    // ─── Scène 6 (17,8 → 20 s) : sortie Picard Serrures ───
+    set($('s6'), { o: t >= 17.7 ? 1 : 0 });
+    const rv = eio(p(t, 17.95, 18.75));
+    $('logo').style.clipPath = `inset(0 ${100 - rv * 100}% 0 0)`;
+    set($('logoWrap'), { s: .92 + .08 * eo(p(t, 17.95, 19.2)) });
+    $('sweep').style.left = `${rv * 700 - 8}px`; $('sweep').style.opacity = rv > 0 && rv < 1 ? 1 : 0;
+    $('line').style.transform = `scaleX(${eo(p(t, 18.55, 19.1))})`;
+    io($('s6t'), t, 18.75, 19.2, 99, 100, 30);
+    const cc = p(t, 19.0, 19.4); set($('s6c'), { o: Math.min(1, cc * 2), s: cc ? back(cc) : .6 });
+}
+
+// Aperçu en boucle (désactivé pour le rendu vidéo : ?render)
+function ajuster() { const k = Math.min(innerWidth / 1080, innerHeight / 1920); $('film').style.transform = `scale(${k})`; }
+window.RENDER = location.search.includes('render');
+if (!window.RENDER) {
+    addEventListener('resize', ajuster); ajuster();
+    let t0 = null; const loop = ts => { if (t0 == null) t0 = ts; render(((ts - t0) / 1000) % (DUREE + 1)); requestAnimationFrame(loop); };
+    document.fonts.ready.then(() => requestAnimationFrame(loop));
+} else render(0);
+window.render = render;
+</script>
+</body>
+</html>

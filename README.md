@@ -31,6 +31,12 @@ Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glis
 
 Toutes les pages sont utilisables sur téléphone (bon de commande compris : une carte par référence).
 
+## Short réseaux sociaux
+`short/` : vidéo verticale 9:16 de 20 s (1080 × 1920, MP4) pour les pages des IAP, qui reprend le post réseaux sociaux et les produits de l’offre, sans les prix revendeurs. Elle se termine par l’appel à l’action et l’animation Picard Serrures.
+- `short/index.html` : l’animation (aperçu en boucle dans le navigateur) ;
+- `short/render.js` : régénère la vidéo (`node short/render.js`, nécessite Playwright et ffmpeg) ;
+- `short/short-coup-de-boost.mp4` : la vidéo, sans musique (à ajouter dans l’application du réseau social).
+
 ## Données et sécurité
 
 - Base Supabase du projet **COMMERCE**, tables séparées `boost_*` (aucun lien avec PICARD-ATC). Schéma : [`sql/schema.sql`](sql/schema.sql).
