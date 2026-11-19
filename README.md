@@ -9,7 +9,7 @@ Opération flash sur les serrures de sécurité, réservée au réseau des Insta
 | `index.html` | Présentation de l’opération (visio du 20/11) : 13 slides | Libre |
 | `atc.html` | Espace de chaque ATC : sa to-do phoning | Code personnel |
 | `suivi.html` | Tableau de suivi : direction, ADV | Code direction ou ADV |
-| `bon.html` | Bon de commande imprimable (prérempli depuis l’espace ATC) | Libre, vide par défaut |
+| `bon.html` | Bon de commande imprimable (prérempli depuis l’espace ATC), bloc « Bon pour accord » éditable : signataire, qualité, lieu, date, signature à main levée, cachet en image | Libre, vide par défaut |
 
 ### Présentation
 Flèches du clavier, espace ou clic pour avancer, `F` pour le plein écran, glisser sur mobile. Les prix et remises sont calculés à partir de `js/offre.js`. Bouton **PDF** (ou touche `P`) : export une slide par page. Slide « Le kit » : un clic sur *Mail type* affiche le mail prêt à copier, *Bon de commande* ouvre le bon, *Fiches produits* renvoie aux slides produits.
